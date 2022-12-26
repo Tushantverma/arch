@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#part1
 ##########################################################################
 ################### checking internet connection #########################
 ##########################################################################
@@ -35,7 +36,12 @@ sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 15/" /etc/pacman.conf
 ######################### fixing archlinux keyring #######################
 ##########################################################################
 
-pacman --noconfirm -Syyyy archlinux-keyring
+pacman -Syyyy
+pacman-key --init
+pacman-key --populate
+pacman-key --refresh-keys
+pacman --noconfirm -Syyyy archlinux-keyring reflector
+reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist
 
 # update your pacman keyring (if you have any issue try billow process one by one)
 # pacman -Syyyy
@@ -144,9 +150,45 @@ genfstab -U /mnt >> /mnt/etc/fstab
 ########################### chroot into system ###########################
 ##########################################################################
 
-arch-chroot /mnt
+echo "chrooting into system"
+sleep 5s
 
 
+# create a new script which starts with #part2 and run it in arch-chroot
+sed '1,/^#part2$/d' `basename $0` > /mnt/install2.sh 
+chmod +x /mnt/install2.sh
+arch-chroot /mnt ./install2.sh
+
+# after running the #part2 unmount /mnt and reboot
+umount -R /mnt
+
+echo "installaion DONE auto reboot in 5 second"
+sleep 5s
+reboot
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#part2
 ##########################################################################
 ########################### setting up clock #############################
 ##########################################################################
@@ -236,6 +278,8 @@ pacman -S --noconfirm xorg-server xorg-apps xorg-xinit mesa xf86-video-intel int
 echo "set password for root user"
 passwd
 
+#username: root
+#password:
 
 ##########################################################################
 ###################### setting up GRUB BOOTLOADER ########################
@@ -326,10 +370,31 @@ systemctl enable NetworkManager
 
 
 ##########################################################################
-############### run reflector after install (if needed)###################
+#############################(( others ))#################################
 ##########################################################################
 
-echo "you can reboot now"
+# uncomment multilib in /etc/pacman.conf     [multilib] with sed try
+# run reflector after install done maybe needed
+# check mkinitcpio.conf how to sed and add btrfs module
+
+echo "exiting form chroot"
+exit
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
