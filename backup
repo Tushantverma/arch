@@ -1,0 +1,201 @@
+# system should be UEFI enabled + GPT formated disk
+
+
+# how to install arch linux
+# connect to the wifi network
+$ iwctl
+	> device list (show device list)
+	> station wlan0 scan (to scan wifi near me)
+	> station wlan0 get-network (to show all network)
+	> station wlan0 connect "ESSID" (you can directlly connect it by this)
+		passphrase: *****
+# exit and check $ping google.com
+
+===============================================================================
+
+speed up parlell downloads
+vim /etc/pacman.conf
+
+===============================================================================
+
+
+# update your pacman keyring (if you have any issue try billow process one by one)
+pacman -Syyyy
+pacman-key --init
+pacman-key --populate
+pacman-key --refresh-keys
+pacman -S archlinux-keyring
+pacman -S reflector
+	  mirror='sudo reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist'
+	  mirrora='sudo reflector --latest 30 --number 10 --sort age --save /etc/pacman.d/mirrorlist'
+	  mirrord='sudo reflector --latest 30 --number 10 --sort delay --save /etc/pacman.d/mirrorlist'
+	  mirrors='sudo reflector --latest 30 --number 10 --sort score --save /etc/pacman.d/mirrorlist'
+	  mirrorx='sudo reflector --age 6 --latest 20  --fastest 20 --threads 5 --sort rate --protocol https --save /etc/pacman.d/mirrorlist'
+reboot your system if problem is not fixed
+
+===============================================================================
+# sync your clock
+timedatectl set-ntp true
+
+===============================================================================
+
+
+# show all disk partition use billow command
+lsblk || fdisk -l
+
+# partition with cfdisk
+cfdisk /dev/sda    (choose full disk to create partion don't use /dev/sda1 XXX wrong way)
+	# create partition
+	(/dev/sda1)				BOOT
+	(/dev/sda2)				SWAP 
+	(/dev/sda3)				LINUX(btrfs/ext4)
+	# write and then quit
+
+# format the partition
+mkfs.fat -F32 /dev/sda1
+
+mkswap /dev/sda2
+swapon /dev/sda2
+
+			mkfs.ext4 /dev/sda3 
+			 -------or--------
+			mkfs.btrfs /dev/sda3
+			mount /dev/sda3 /mnt
+				btrfs su cr /mnt/@
+				btrfs su cr /mnt/@home
+				btrfs su cr /mnt/@var
+				btrfs su cr /mnt/@opt
+				btrfs su cr /mnt/@tmp
+				btrfs su cr /mnt/@.snapshots
+				umount /mnt
+
+
+				mount -o noatime,commit=120,compress=zstd,space_cache,subvol=@ /dev/sda3 /mnt
+				# You need to manually create folder to mount the other subvolumes at
+				mkdir /mnt/{boot,home,var,opt,tmp,.snapshots}
+
+				mount -o noatime,commit=120,compress=zstd,space_cache,subvol=@home /dev/sda3 /mnt/home
+
+				mount -o noatime,commit=120,compress=zstd,space_cache,subvol=@opt /dev/sda3 /mnt/opt
+
+				mount -o noatime,commit=120,compress=zstd,space_cache,subvol=@tmp /dev/sda3 /mnt/tmp
+
+				mount -o noatime,commit=120,compress=zstd,space_cache,subvol=@.snapshots /dev/sda3 /mnt/.snapshots
+
+				mount -o subvol=@var /dev/sda3 /mnt/var
+				# Mounting the boot partition at /boot folder
+				mount /dev/sda1 /mnt/boot
+
+
+# make directory
+mkdir /boot/EFI
+
+# mount the partiton
+mount /dev/sda1 /boot/EFI
+
+# install the packages
+pacstrap -i /mnt base linux linux-firmware linux-headers base-devel vim  [linux-lts ]
+pacstrap    /mnt base linux linux-firmware intel-ucode btrfs-progs
+--------------------------------------or----------------------------------------
+arch-chroot /mnt /bin/bash(maybe needed)
+		pacman -S networkmanager grub efibootmgr
+		systemctl enable NetworkManager (start on boot)
+
+=========================================================================================
+
+# install grub bootloader
+
+grub-install -target=x86_64-efi --bootloader-id=GRUB --efi_directory=/boot/EFI
+---------------------------------IDK-----------------------------------------
+grub-install /dev/sda (for entire dirve)
+		     /dev/sdaX(for one partition)
+grub-mkconfig -o /boot/grub/grub.cfg
+
+
+
+=========================================================================================
+
+# fstab (why this genrate)
+genfstab -U /mnt >> /mnt/etc/fstab
+cat /mnt/etc/fstab (to check)
+
+
+=========================================================================================
+
+# set password for root user
+passwd
+==>:________
+=======>:_________
+
+=========================================================================================
+setup your locale (setup language for the system)
+vim /etc/locale.conf
+		LANG=en_US.UTF-8
+
+vim /etc/locale.gen
+		en_US.UTF-8 UTF-8
+		en_US ISO-8859-1
+		(uncomment above from the group)
+locale-gen    (must run to genrate)
+
+
+=========================================================================================
+
+# setup your HostName (computer name show in shell)
+vim /etc/hostname
+		tv (any name you want to give your this host machine just write it on the plane text no qouts or anything)
+
+vim /etc/hosts
+	127.0.0.1 localhost
+	::1       localhost
+	127.0.0.1 tv                  (this is host name)
+
+=========================================================================================
+
+# setup your time zone (i don't know why i need this if timedatectl set-ntp true is already there )
+# file is already in your system you just need to link it with other localtion
+
+ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime
+					       <TAB> / <TAB>
+---------------------or------------------------------
+timedatectl list-timezones
+timedatectl set-timezone Asia/Kalkata
+							 /Calcutta (maybe)
+
+=========================================================================================
+
+# add user in the sudo group (to use sudo command by user)
+pacman -S sudo
+
+useradd -m -g users -G wheel t 
+passwd t  (set password for the t user)
+==>:________
+=======>:_________
+
+-m --> (create home directory for user)
+t -->  (username)
+
+#### now modify the sudo previlige for the wheel group by this your user can use the sudo command
+EDITOR=vim visudo
+	%wheel ALL=(ALL) ALL    (uncomment this line)
+
+=========================================================================================
+
+# install the graphic driver
+pacman -S xorg-server masa
+
+masa --> (for intel graphic)
+
+
+
+=========================================================================================
+
+exit (form chroot)
+
+umount -R /mnt               (unmount boot and root partition)
+umount -a 					 (remove all partition everything)
+
+reboot
+
+
+
