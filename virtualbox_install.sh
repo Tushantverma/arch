@@ -5,3 +5,6 @@ yay -S virtualbox-ext-oracle
 sudo systemctl enable vboxweb.service
 sudo systemctl start vboxweb.service
 lsmod | grep -i vbox
+
+#source
+#https://www.linuxtechi.com/install-virtualbox-on-arch-linux/

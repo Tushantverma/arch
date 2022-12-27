@@ -5,14 +5,14 @@
 ################### checking internet connection #########################
 ##########################################################################
 
-if ping -c 4 google.com > /dev/null;
-then 
-	echo "Connected to the internet all done"
-else
-	echo "No internet connection read comment"
-	echo "use iwctl to connect... ex: station wlan0 connect 'ESSID'"
-	exit 1
-fi
+# if ping -c 4 google.com > /dev/null;
+# then 
+# 	 echo "Connected to the internet all done"
+# else
+#	 echo "No internet connection read comment"
+#	 echo "use iwctl to connect... ex: station wlan0 connect 'ESSID'"
+#	 exit 1
+# fi
 
 # how to install arch linux
 # connect to the wifi network
@@ -155,7 +155,7 @@ sleep 5s
 
 
 # create a new script which starts with #part2 and run it in arch-chroot
-sed '1,/^#part2$/d' `basename $0` > /mnt/install2.sh 
+sed '1,/^#part22$/d' install.sh > /mnt/install2.sh 
 chmod +x /mnt/install2.sh
 arch-chroot /mnt ./install2.sh
 
@@ -164,7 +164,7 @@ umount -R /mnt
 
 echo "installaion DONE auto reboot in 5 second"
 sleep 5s
-reboot
+echo "you can REBOOT now"
 
 
 
@@ -188,7 +188,7 @@ reboot
 
 
 
-#part2
+#part22
 ##########################################################################
 ########################### setting up clock #############################
 ##########################################################################
