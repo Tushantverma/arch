@@ -37,9 +37,9 @@ sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 15/" /etc/pacman.conf
 ##########################################################################
 
 pacman -Syyyy
-pacman-key --init
-pacman-key --populate
-pacman-key --refresh-keys
+# pacman-key --init
+# pacman-key --populate
+# pacman-key --refresh-keys
 pacman --noconfirm -Syyyy archlinux-keyring reflector
 reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist
 
@@ -155,7 +155,7 @@ sleep 5s
 
 
 # create a new script which starts with #part2 and run it in arch-chroot
-sed '1,/^#part22$/d' install.sh > /mnt/install2.sh 
+sed "1,/^#part22$/d" install.sh > /mnt/install2.sh 
 chmod +x /mnt/install2.sh
 arch-chroot /mnt ./install2.sh
 
