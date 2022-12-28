@@ -307,7 +307,9 @@ grub-mkconfig -o /boot/grub/grub.cfg
 #		 BINARIES=(btrfs) (NOT USING)
 # mkinitcpio -p linux
 
-#sed -i "s/^MODULES=()/MODULES=(btrfs )/" /etc/mkinitcpio.conf
+sed -i "s/MODULES=()/MODULES=(btrfs)/" /etc/mkinitcpio.conf
+mkinitcpio -p linux
+
 #btrfs crc32c-intel
 
 
@@ -326,8 +328,9 @@ passwd $username
 
 ## adding user into wheel group ##
 #echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers  (other option)
+#echo "%wheel ALL=(ALL:ALL) ALL" >> /etc/sudoers 
 #sed -i "s/^#%wheel ALL=(ALL) NOPASSWD: ALL/%wheel ALL=(ALL) NOPASSWD: ALL/" /etc/sudoers
-sed -i "s/^#%wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/" /etc/sudoers
+sed -i "s/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/" /etc/sudoers
 
 #### or ####
 #EDITOR=vim visudo
@@ -375,8 +378,14 @@ systemctl enable NetworkManager
 ##########################################################################
 
 # uncomment multilib in /etc/pacman.conf     [multilib] with sed try
+echo "[multilib]" 							>> /etc/pacman.conf
+echo "Include = /etc/pacman.d/mirrorlist" 	>> /etc/pacman.conf
+
 # run reflector after install done maybe needed
 # check mkinitcpio.conf how to sed and add btrfs module
+
+
+
 
 echo "exiting form chroot"
 exit
