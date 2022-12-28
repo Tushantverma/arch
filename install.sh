@@ -74,6 +74,13 @@ else
 fi
 
 
+echo "##########################################################################"
+echo "################## setting/syncing time with network #####################"
+echo "##########################################################################"
+
+timedatectl set-ntp true
+
+
 
 echo "##########################################################################"
 echo "######################## partitioning the disk ###########################"
@@ -201,9 +208,6 @@ ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime
 
 # sync hardware clock
 hwclock --systohc
-
-# syncing time with network
-timedatectl set-ntp true
 
 
 echo "##########################################################################"
