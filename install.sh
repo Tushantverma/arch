@@ -381,6 +381,8 @@ echo "##########################################################################
 echo " "                                    >> /etc/pacman.conf
 echo "[multilib]"                           >> /etc/pacman.conf
 echo "Include = /etc/pacman.d/mirrorlist"   >> /etc/pacman.conf
+pacman -Syyyy
+
 
 # run reflector after install done maybe needed
 # check mkinitcpio.conf how to sed and add btrfs module
@@ -394,7 +396,7 @@ echo "##########################################################################
 
 git clone --depth 1 https://github.com/arcolinux/arcolinux-spices.git
 ./arcolinux-spices/usr/share/arcolinux-spices/scripts/get-the-keys-and-repos.sh
-
+pacman -Syyyy
 
 
 echo "part2 is DONE here"
