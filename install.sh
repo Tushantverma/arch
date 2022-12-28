@@ -378,8 +378,10 @@ systemctl enable NetworkManager
 ##########################################################################
 
 # uncomment multilib in /etc/pacman.conf     [multilib] with sed try
-echo "[multilib]" 							>> /etc/pacman.conf
-echo "Include = /etc/pacman.d/mirrorlist" 	>> /etc/pacman.conf
+
+echo " "                                    >> /etc/pacman.conf
+echo "[multilib]"                           >> /etc/pacman.conf
+echo "Include = /etc/pacman.d/mirrorlist"   >> /etc/pacman.conf
 
 # run reflector after install done maybe needed
 # check mkinitcpio.conf how to sed and add btrfs module
@@ -387,8 +389,8 @@ echo "Include = /etc/pacman.d/mirrorlist" 	>> /etc/pacman.conf
 
 
 
-echo "exiting form chroot"
-exit
+echo "part2 is DONE here"
+
 
 
 
