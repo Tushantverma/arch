@@ -157,16 +157,15 @@ chmod +x /mnt/install2.sh
 arch-chroot /mnt ./install2.sh
 
 # must to otherwise it will rerun the billow script after chroot
-echo "clear screen in 5 second"
+echo "exit screen in 5 second"
 sleep 5s
-clear
+exit
 
 # after running the #part2 unmount /mnt and reboot
 umount -R /mnt
 
-echo "installaion DONE auto reboot in 5 second"
-sleep 5s
-echo "you can REBOOT now"
+echo "installaion DONE you can reboot now"
+
 
 
 
@@ -229,7 +228,7 @@ echo "KEYMAP=us" > /etc/vconsole.conf
 ########################### setting up your HOST #########################
 ##########################################################################
 
-echo "write HostName/username of the OS: "
+echo "write HostName/username of the OS(tv): "
 read hostname
 echo $hostname > /etc/hostname
 
