@@ -248,7 +248,7 @@ echo "##########################################################################
 echo "###################### install all needed packages #######################"
 echo "##########################################################################"
 
-pacman -S --noconfirm grub grub-btrfs efibootmgr networkmanager network-manager-applet os-prober bash-completion
+pacman -S --noconfirm grub grub-btrfs efibootmgr networkmanager network-manager-applet os-prober bash-completion git
 # not installing right now ==>  linux-headers-lts linux-lts mtools dialogs dosfstools reflector
 
 
