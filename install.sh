@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#part1
+#part11
 ##########################################################################
 ################### checking internet connection #########################
 ##########################################################################
@@ -151,7 +151,8 @@ echo "chrooting into system"
 sleep 5s
 
 
-# create a new script which starts with #part2 and run it in arch-chroot
+# create a new script which starts with #part2 
+# runing the #part2 of script in arch-chroot
 sed "1,/^#part22$/d" ~/arch/install.sh > /mnt/install2.sh 
 chmod +x /mnt/install2.sh
 arch-chroot /mnt ./install2.sh
@@ -384,6 +385,15 @@ echo "Include = /etc/pacman.d/mirrorlist"   >> /etc/pacman.conf
 # run reflector after install done maybe needed
 # check mkinitcpio.conf how to sed and add btrfs module
 
+
+
+
+##########################################################################
+######################## getting arco key and repo #######################
+##########################################################################
+
+git clone --depth 1 https://github.com/arcolinux/arcolinux-spices.git
+./arcolinux-spices/usr/share/arcolinux-spices/scripts/get-the-keys-and-repos.sh
 
 
 
