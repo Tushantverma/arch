@@ -156,16 +156,14 @@ sed "1,/^#part22$/d" ~/arch/install.sh > /mnt/install2.sh
 chmod +x /mnt/install2.sh
 arch-chroot /mnt ./install2.sh
 
-# must to otherwise it will rerun the billow script after chroot
-echo "exit screen in 5 second"
-sleep 5s
-exit
 
 # after running the #part2 unmount /mnt and reboot
+echo "unmount /mnt && exit script in 10 second"
+sleep 10s
 umount -R /mnt
 
 echo "installaion DONE you can reboot now"
-
+exit
 
 
 
