@@ -73,11 +73,6 @@ else
 	exit 1
 fi
 
-echo "##########################################################################"
-echo "################## setting/syncing time with network #####################"
-echo "##########################################################################"
-
-timedatectl set-ntp true
 
 
 echo "##########################################################################"
@@ -134,6 +129,7 @@ mkfs.btrfs $linuxpartition
 	mount $bootpartition /mnt/boot/efi
 
 lsblk
+sleep 5s
 
 
 pacstrap /mnt base base-devel linux linux-firmware vim btrfs-progs
@@ -157,10 +153,10 @@ sed "1,/^#part22$/d" ~/arch/install.sh > /mnt/install2.sh
 chmod +x /mnt/install2.sh
 arch-chroot /mnt ./install2.sh
 
-
 # after running the #part2 unmount /mnt and reboot
-echo "unmount /mnt && exit script in 10 second"
+echo "unmount /mnt && exit script && removeing /mnt/install2.sh in 10 second"
 sleep 10s
+rm -rf /mnt/install2.sh
 umount -R /mnt
 
 echo "installaion DONE you can reboot now"
@@ -205,6 +201,10 @@ ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime
 
 # sync hardware clock
 hwclock --systohc
+
+# syncing time with network
+timedatectl set-ntp true
+
 
 echo "##########################################################################"
 echo "########################### setting up your local ########################"
@@ -255,6 +255,9 @@ pacman -S --noconfirm grub grub-btrfs efibootmgr networkmanager network-manager-
 ### installing graphic packages ######
 pacman -S --noconfirm xorg-server xorg-apps xorg-xinit mesa xf86-video-intel intel-ucode
 
+
+### my packages
+pacman -S --noconfirm bat htop neofetch
 
 
 #### bugs pkg ####
@@ -384,7 +387,7 @@ echo "Include = /etc/pacman.d/mirrorlist"   >> /etc/pacman.conf
 pacman -Syyyy
 
 
-# run reflector after install done maybe needed
+# reflector now needed after install it will get mirrorlist form live install to main system
 # check mkinitcpio.conf how to sed and add btrfs module
 
 
@@ -397,7 +400,7 @@ echo "##########################################################################
 git clone --depth 1 https://github.com/arcolinux/arcolinux-spices.git
 ./arcolinux-spices/usr/share/arcolinux-spices/scripts/get-the-keys-and-repos.sh
 pacman -Syyyy
-
+rm -rf arcolinux-spices
 
 echo "part2 is DONE here"
 
