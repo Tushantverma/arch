@@ -405,6 +405,8 @@ git clone --depth 1 https://github.com/arcolinux/arcolinux-spices.git
 ./arcolinux-spices/usr/share/arcolinux-spices/scripts/get-the-keys-and-repos.sh
 pacman -Syyyy
 rm -rf arcolinux-spices
+# source :- https://www.arcolinux.info/arcolinux-spices-application/
+
 
 echo "part2 is DONE here"
 
