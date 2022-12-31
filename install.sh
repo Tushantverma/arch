@@ -292,13 +292,24 @@ echo "##########################################################################
 echo "###################### setting up GRUB BOOTLOADER ########################"
 echo "##########################################################################"
 
-grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
+grub-install --target=x86_64-efi --efi-directory=/boot/efi
+#(--bootloader-id=arch ) default bootloader id is already "arch" only add --bootloader-id=XYZ if you want to change default
+#grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
 
 ######## booting grub faster
 #sed -i 's/quiet/pci=noaer/g' /etc/default/grub
 #sed -i 's/GRUB_TIMEOUT=5/GRUB_TIMEOUT=0/g' /etc/default/grub
 
+# this will show the entry of other OS on grub if you are using dual boot windows will show in the grub (must needed) <<<======
+echo "GRUB_DISABLE_OS_PROBER=false" >> /etc/default/grub
+
 grub-mkconfig -o /boot/grub/grub.cfg
+
+
+# to fix the configuration of grub (must needed) <<<<<=======================================
+mkdir /boot/efi/EFI/boot
+cp /boot/efi/EFI/arch/grubx64.efi /boot/efi/EFI/boot/bootx64.efi
+
 
 
 
