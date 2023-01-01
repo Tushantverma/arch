@@ -41,7 +41,7 @@ pacman --noconfirm -Syyyy archlinux-keyring reflector
 reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist
 
 # update your pacman keyring (if you have any issue try billow process one by one)
-# pacman -Syyyy
+# pacman -Syyy
 # pacman-key --init
 # pacman-key --populate
 # pacman-key --refresh-keys
@@ -89,7 +89,9 @@ echo "##########################################################################
 lsblk
 # $fdisk -l (alternetive shows full drive name with /dev/sdaX) 
 
+echo "#################################"
 echo "##### THIS IS BTRFS INSTALL #####"
+echo "##### YOU DON'T NEED TO DELETE AND RECREATE PARTITION IF IT'S ALREADY THERE JUST ENTER IN CFDISK CHECK EVERYTHING THEN QUIT #####"
 
 echo "Enter the drive (/dev/sda) : "
 read drive
@@ -97,17 +99,26 @@ cfdisk $drive
 
 lsblk
 
+######## how to wipe your file signature/ complete wipe your disk or partition ############
+# wipefs -a /dev/sda  ###(to wipe only all file signature) faster method ===>recommended 
+# wipefs -t ext4 /dev/sda  ###(to wipe only specific file signature only not all file signature) faster method (never tried)
+# dd if=/dev/zero of=/dev/sda bs=1M  ###(to complete wipe full file system or full partition by adding random data 1 time)
+# shred -vfz /dev/sda ###(to complete wipe full file system or full partition by adding random data 4 time) (most secure way. time taking) not good for ssd life
+
 echo "Enter the BOOT partition (/dev/sdaX) : "
 read bootpartition
+wipefs -a $bootpartition  # wipe boot file signature 
 mkfs.vfat -F32 $bootpartition
 
 echo "Enter the SWAP partition (/dev/sdaX) : "
 read swappartition
+wipefs -a $swappartition # wipe swap file signature
 mkswap $swappartition
 swapon $swappartition
 
 echo "Enter the LINUX partition (/dev/sdaX) : "
 read linuxpartition
+wipefs -a $linuxpartition  # wipe linux file signature
 mkfs.btrfs $linuxpartition
 	mount $linuxpartition /mnt
 			btrfs su cr /mnt/@
@@ -244,7 +255,7 @@ echo "##########################################################################
 echo "################## setting up Parallel Downloads in chroot ###############"
 echo "##########################################################################"
 
-pacman -Syyyy --noconfirm sed
+pacman -Syyy --noconfirm sed
 sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 15/" /etc/pacman.conf
 
 
@@ -399,7 +410,7 @@ echo "##########################################################################
 echo " "                                    >> /etc/pacman.conf
 echo "[multilib]"                           >> /etc/pacman.conf
 echo "Include = /etc/pacman.d/mirrorlist"   >> /etc/pacman.conf
-pacman -Syyyy
+pacman -Syyy
 
 
 # reflector now needed after install it will get mirrorlist form live install to main system
@@ -414,7 +425,7 @@ echo "##########################################################################
 
 git clone --depth 1 https://github.com/arcolinux/arcolinux-spices.git
 ./arcolinux-spices/usr/share/arcolinux-spices/scripts/get-the-keys-and-repos.sh
-pacman -Syyyy
+pacman -Syyy
 rm -rf arcolinux-spices
 # source :- https://www.arcolinux.info/arcolinux-spices-application/
 
