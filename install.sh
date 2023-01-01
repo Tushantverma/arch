@@ -316,6 +316,7 @@ grub-install --target=x86_64-efi --efi-directory=/boot/efi
 # this will show the entry of other OS on grub if you are using dual boot windows will show in the grub (must needed) <<<======
 echo "GRUB_DISABLE_OS_PROBER=false" >> /etc/default/grub
 
+# this is also known as "update-grub" command in other distribution you can make alias of this
 grub-mkconfig -o /boot/grub/grub.cfg
 
 
