@@ -108,18 +108,20 @@ lsblk
 echo "Enter the BOOT partition (/dev/sdaX) : "
 read bootpartition
 wipefs -a $bootpartition  # wipe boot file signature 
-mkfs.vfat -F32 $bootpartition
+mkfs.vfat -F32 $bootpartition -f     ###-f = forcefully if any error there
 
 echo "Enter the SWAP partition (/dev/sdaX) : "
 read swappartition
 wipefs -a $swappartition # wipe swap file signature
-mkswap $swappartition
+mkswap $swappartition -f    ###-f = forcefully if any error there
 swapon $swappartition
 
 echo "Enter the LINUX partition (/dev/sdaX) : "
 read linuxpartition
 wipefs -a $linuxpartition  # wipe linux file signature
-mkfs.btrfs $linuxpartition
+mkfs.btrfs $linuxpartition -f   ###-f = forcefully if any error there
+
+sleep 10s #check all correct above
 	mount $linuxpartition /mnt
 			btrfs su cr /mnt/@
 			btrfs su cr /mnt/@home
