@@ -37,7 +37,7 @@ echo "######################### fixing archlinux keyring #######################
 echo "##########################################################################"
 
 
-pacman --noconfirm -Syyyy archlinux-keyring reflector
+pacman --noconfirm -Syyy archlinux-keyring reflector
 reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist
 
 # update your pacman keyring (if you have any issue try billow process one by one)
@@ -108,7 +108,7 @@ lsblk
 echo "Enter the BOOT partition (/dev/sdaX) : "
 read bootpartition
 wipefs -a $bootpartition  # wipe boot file signature 
-mkfs.vfat -F32 $bootpartition -f     ###-f = forcefully if any error there
+mkfs.vfat -F32 $bootpartition 
 
 echo "Enter the SWAP partition (/dev/sdaX) : "
 read swappartition
