@@ -130,13 +130,14 @@ sleep 10s #check all correct above
 			btrfs su cr /mnt/@log
 			btrfs su cr /mnt/@cache
 			btrfs su cr /mnt/@tmp
+			btrfs su cr /mnt/@snapshots
 			btrfs su li /mnt 
 
 			cd /
 			umount /mnt 
 
 			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@      $linuxpartition /mnt
-			mkdir -p /mnt/{home,root,srv,var/log,var/cache,tmp}
+			mkdir -p /mnt/{.snapshots,home,root,srv,var/log,var/cache,tmp}
 
 			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@home  $linuxpartition /mnt/home
 			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@root  $linuxpartition /mnt/root
@@ -144,6 +145,7 @@ sleep 10s #check all correct above
 			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@log   $linuxpartition /mnt/var/log
 			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@cache $linuxpartition /mnt/var/cache
 			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@tmp   $linuxpartition /mnt/tmp
+			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@snapshots   $linuxpartition /mnt/.snapshots
 
 	mkdir -p /mnt/boot/efi
 	mount $bootpartition /mnt/boot/efi
@@ -157,7 +159,7 @@ pacstrap /mnt base base-devel linux-zen linux-firmware vim btrfs-progs
 # linux
 # linux-hardened
 # linux-lts
-# linux-zen
+# linux-zen       # its removing my display blinking issue
 
 genfstab -U /mnt >> /mnt/etc/fstab
 #cat /mnt/etc/fstab   (to check fstab is correcto to not)
