@@ -152,7 +152,12 @@ lsblk
 sleep 5s
 
 
-pacstrap /mnt base base-devel linux linux-firmware vim btrfs-progs
+pacstrap /mnt base base-devel linux-zen linux-firmware vim btrfs-progs
+# what ever the linux kernal you are using here you also need to change it in mkinitcpio and linux-headers if you are using it
+# linux
+# linux-hardened
+# linux-lts
+# linux-zen
 
 genfstab -U /mnt >> /mnt/etc/fstab
 #cat /mnt/etc/fstab   (to check fstab is correcto to not)
@@ -270,7 +275,8 @@ pacman -S --noconfirm grub grub-btrfs efibootmgr networkmanager network-manager-
 
 
 ### installing graphic packages ######
-pacman -S --noconfirm xorg-server xorg-apps xorg-xinit mesa xf86-video-intel intel-ucode
+pacman -S --noconfirm xorg-server xorg-apps xorg-xinit mesa intel-ucode
+## xf86-video-intel ## not installing this pkg because its changing display name error for other pkg (eg. vibrent-linux)
 
 
 ### my packages
@@ -339,7 +345,7 @@ echo "##########################################################################
 # mkinitcpio -p linux
 
 sed -i "s/MODULES=()/MODULES=(btrfs)/" /etc/mkinitcpio.conf
-mkinitcpio -p linux
+mkinitcpio -p linux-zen
 
 #btrfs crc32c-intel
 
