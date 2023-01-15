@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#setfont ter-128n   #### changing the font size 
+#setfont ter-128n   #### changing the font size "ter" is a font name and "128n" is the font size
 #part11
 echo "##########################################################################"
 echo "################### checking internet connection #########################"
@@ -123,33 +123,66 @@ wipefs -af $linuxpartition  # wipe linux file signature forcefully
 mkfs.btrfs $linuxpartition -f   ###-f = forcefully if any error there
 
 sleep 10s #check all correct above
-	mount $linuxpartition /mnt
-			btrfs su cr /mnt/@
-			btrfs su cr /mnt/@home
-			btrfs su cr /mnt/@root
-			btrfs su cr /mnt/@srv
-			btrfs su cr /mnt/@log
-			btrfs su cr /mnt/@cache
-			btrfs su cr /mnt/@tmp
-			btrfs su cr /mnt/@snapshots
-			btrfs su li /mnt 
+#	mount $linuxpartition /mnt
+#			btrfs su cr /mnt/@
+#			btrfs su cr /mnt/@home
+#			btrfs su cr /mnt/@root
+#			btrfs su cr /mnt/@srv
+#			btrfs su cr /mnt/@log
+#			btrfs su cr /mnt/@cache
+#			btrfs su cr /mnt/@tmp
+#			btrfs su cr /mnt/@snapshots
+#			btrfs su li /mnt 
+#
+#			cd /
+#			umount /mnt 
+#
+#			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@      $linuxpartition /mnt
+#			mkdir -p /mnt/{.snapshots,home,root,srv,var/log,var/cache,tmp}
+#
+#			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@home  $linuxpartition /mnt/home
+#			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@root  $linuxpartition /mnt/root
+#			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@srv   $linuxpartition /mnt/srv
+#			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@log   $linuxpartition /mnt/var/log
+#			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@cache $linuxpartition /mnt/var/cache
+#			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@tmp   $linuxpartition /mnt/tmp
+#			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@snapshots   $linuxpartition /mnt/.snapshots
+#
+#	mkdir -p /mnt/boot/efi
+#	mount $bootpartition /mnt/boot/efi
 
-			cd /
-			umount /mnt 
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+# Creating BTRFS subvolumes.
+mount $linuxpartition /mnt
+subvols=(snapshots var_pkgs var_log home root srv)
+for subvol in '' "${subvols[@]}"; do
+    btrfs su cr /mnt/@"$subvol" &>/dev/null
+done
 
-			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@      $linuxpartition /mnt
-			mkdir -p /mnt/{.snapshots,home,root,srv,var/log,var/cache,tmp}
+umount /mnt
 
-			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@home  $linuxpartition /mnt/home
-			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@root  $linuxpartition /mnt/root
-			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@srv   $linuxpartition /mnt/srv
-			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@log   $linuxpartition /mnt/var/log
-			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@cache $linuxpartition /mnt/var/cache
-			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@tmp   $linuxpartition /mnt/tmp
-			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@snapshots   $linuxpartition /mnt/.snapshots
 
-	mkdir -p /mnt/boot/efi
-	mount $bootpartition /mnt/boot/efi
+mountopts="defaults,noatime,compress-force=zstd:3,discard=async"
+mount -o "$mountopts",subvol=@ "$linuxpartition" /mnt
+mkdir -p /mnt/{home,root,srv,.snapshots,var/{log,cache/pacman/pkg},boot}
+for subvol in "${subvols[@]:2}"; do
+    mount -o "$mountopts",subvol=@"$subvol" "$linuxpartition" /mnt/"${subvol//_//}"
+done
+chmod 750 /mnt/root
+mount -o "$mountopts",subvol=@snapshots "$linuxpartition" /mnt/.snapshots
+mount -o "$mountopts",subvol=@var_pkgs "$linuxpartition" /mnt/var/cache/pacman/pkg
+chattr +C /mnt/var/log
+
+mkdir -p /mnt/boot/efi
+mount $bootpartition /mnt/boot/efi
+########################################################################################################################################
+########################################################################################################################################
+########################################################################################################################################
+
+
+
 
 lsblk
 sleep 5s
