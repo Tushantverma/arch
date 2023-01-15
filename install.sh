@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#setfont ter-128n   #### changing the font size 
 #part11
 echo "##########################################################################"
 echo "################### checking internet connection #########################"
