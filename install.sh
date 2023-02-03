@@ -137,50 +137,31 @@ sleep 10s #check all correct above
 			cd /
 			umount /mnt 
 
-			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@      $linuxpartition /mnt
+			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,commit=120,subvol=@      		$linuxpartition /mnt
 			mkdir -p /mnt/{.snapshots,home,root,srv,var/log,var/cache,tmp}
 
-			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@home  $linuxpartition /mnt/home
-			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@root  $linuxpartition /mnt/root
-			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@srv   $linuxpartition /mnt/srv
-			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@log   $linuxpartition /mnt/var/log
-			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@cache $linuxpartition /mnt/var/cache
-			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@tmp   $linuxpartition /mnt/tmp
-			mount -o defaults,noatime,compress=zstd,commit=120,subvol=@snapshots   $linuxpartition /mnt/.snapshots
+			# I'm setting options manually otherwise it will set some options automatically (this will reflect in /etc/fstab)
+			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,commit=120,subvol=@home  		$linuxpartition /mnt/home
+			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,commit=120,subvol=@root  		$linuxpartition /mnt/root
+			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,commit=120,subvol=@srv   		$linuxpartition /mnt/srv
+			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,commit=120,subvol=@log   		$linuxpartition /mnt/var/log
+			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,commit=120,subvol=@cache 		$linuxpartition /mnt/var/cache
+			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,commit=120,subvol=@tmp   		$linuxpartition /mnt/tmp
+			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,commit=120,subvol=@snapshots   	$linuxpartition /mnt/.snapshots
+			##### others option you can use above #####
+			# ssd, ==> if you are using the ssd
+			#
+			# compress=zstd (auto select compression level) (automatically and recommended) <<<=====================
+			# compress=zstd:3 (good for HDD)(compress almost all files expect some)(low compression faster R/W speed) 
+			# compress-force=zstd:15 (good for SSD)(compress all files forcefully)(high compression low R/W speed)
+			## if you are storing mp3,mp4,zip it's better to use low or no compression because files are already compressed
+			## you can use any number of compression b/w 1 to 19 
+			#
+			# discard=async,space_cache=v2, ==>>> if you dont add this option it will automatically be added in /etc/fstab
+			
 
 	mkdir -p /mnt/boot/efi
 	mount $bootpartition /mnt/boot/efi
-
-########################################################################################################################################
-########################################################################################################################################
-########################################################################################################################################
-# Creating BTRFS subvolumes.
-#mount $linuxpartition /mnt
-#subvols=(snapshots var_pkgs var_log home root srv)
-#for subvol in '' "${subvols[@]}"; do
-#    btrfs su cr /mnt/@"$subvol" &>/dev/null
-#done
-#
-#umount /mnt
-#
-#
-#mountopts="defaults,noatime,compress-force=zstd:3,discard=async"
-#mount -o "$mountopts",subvol=@ "$linuxpartition" /mnt
-#mkdir -p /mnt/{home,root,srv,.snapshots,var/{log,cache/pacman/pkg},boot}
-#for subvol in "${subvols[@]:2}"; do
-#    mount -o "$mountopts",subvol=@"$subvol" "$linuxpartition" /mnt/"${subvol//_//}"
-#done
-#chmod 750 /mnt/root
-#mount -o "$mountopts",subvol=@snapshots "$linuxpartition" /mnt/.snapshots
-#mount -o "$mountopts",subvol=@var_pkgs "$linuxpartition" /mnt/var/cache/pacman/pkg
-#chattr +C /mnt/var/log
-#
-#mkdir -p /mnt/boot/efi
-#mount $bootpartition /mnt/boot/efi
-########################################################################################################################################
-########################################################################################################################################
-########################################################################################################################################
-
 
 
 
@@ -198,7 +179,7 @@ pacstrap /mnt base base-devel linux-zen linux-firmware vim btrfs-progs
 genfstab -U -p /mnt >> /mnt/etc/fstab
 # The -p flag include all the partitions including those that are not currently mounted... -U flags tells use UUID in fstab
 #cat /mnt/etc/fstab   (to check fstab is correcto to not)
-
+sed -i 's#subvolid=[[:digit:]]\+,##g' /mnt/etc/fstab     ### fixing automatically subvolume mount when restoring the snapshots by removing subvolid=256(or any number)
 
 
 echo "##########################################################################"
@@ -247,6 +228,14 @@ exit
 
 
 #part22
+
+echo "##########################################################################"
+echo "################## setting/syncing time with network #####################"
+echo "##################### setting again in the chroot ########################"
+
+timedatectl set-ntp true
+
+
 echo "##########################################################################"
 echo "########################### setting up clock #############################"
 echo "##########################################################################"
