@@ -296,9 +296,9 @@ echo "##########################################################################
 echo "###################### install all needed packages #######################"
 echo "##########################################################################"
 
-pacman -S --noconfirm grub grub-btrfs efibootmgr networkmanager network-manager-applet os-prober bash-completion git
+pacman -S --noconfirm grub grub-btrfs efibootmgr networkmanager network-manager-applet os-prober bash-completion git dosfstools mtools
 # not installing right now ==>  linux-headers-lts linux-lts mtools dialogs dosfstools reflector
-
+# dosfstools mtools ===>>> is required by gparted
 
 ### installing graphic packages ######
 pacman -S --noconfirm xorg-server xorg-apps xorg-xinit mesa intel-ucode
