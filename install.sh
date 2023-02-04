@@ -431,14 +431,6 @@ echo "##########################################################################
 
 
 echo "##########################################################################"
-echo "################## setting/syncing time with network #####################"
-echo "##################### setting again in the chroot ########################"
-
-timedatectl set-ntp true
-
-
-
-echo "##########################################################################"
 echo "#############################(( others ))#################################"
 echo "##########################################################################"
 
@@ -467,7 +459,7 @@ rm -rf arcolinux-spices
 # source :- https://www.arcolinux.info/arcolinux-spices-application/
 
 
-pacman -S --noconfirm sublime-text-4 yay thunar gvfs gvfs-afc thunar-volman tumbler ffmpegthumbnailer thunar-archive-plugin thunar-media-tags-plugin pavucontrol gparted mpv pulseaudio pulseaudio-alsa ntfs-3g feh alacritty sxhkd rofi ttf-iosevka-nerd polkit-gnome
+pacman -S --noconfirm sublime-text-4 yay thunar gvfs gvfs-afc thunar-volman tumbler ffmpegthumbnailer thunar-archive-plugin thunar-media-tags-plugin pavucontrol gparted mpv pulseaudio pulseaudio-alsa ntfs-3g feh alacritty sxhkd rofi ttf-iosevka-nerd polkit-gnome xfce4-power-manager
 
 echo "part2 is DONE here"
 
