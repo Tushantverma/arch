@@ -170,14 +170,14 @@ lsblk
 sleep 5s
 
 
-### what kernal do you want to use
+### what kernal do you want to use (i tried to make veriable but not working in chroot in mkinitcpio)
 # what ever the linux kernal you are using here you also need to change it in mkinitcpio and linux-headers if you are using it
-# myKernal="linux"
-# myKernal="linux-hardened"
-# myKernal="linux-lts"
-myKernal="linux-zen"       # its removing my display blinking issue
+# linux
+# linux-hardened
+# linux-lts
+# linux-zen      # its removing my display blinking issue
 
-pacstrap /mnt base base-devel $myKernal linux-firmware vim btrfs-progs
+pacstrap /mnt base base-devel linux-zen linux-firmware vim btrfs-progs
    
 genfstab -U -p /mnt >> /mnt/etc/fstab
 # The -p flag include all the partitions including those that are not currently mounted... -U flags tells use UUID in fstab
@@ -367,7 +367,7 @@ echo "##########################################################################
 # mkinitcpio -p linux
 
 sed -i "s/MODULES=()/MODULES=(btrfs)/" /etc/mkinitcpio.conf
-mkinitcpio -p $myKernal
+mkinitcpio -p linux-zen
 
 #btrfs crc32c-intel
 
