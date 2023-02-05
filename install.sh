@@ -137,17 +137,17 @@ sleep 10s #check all correct above
 			cd /
 			umount /mnt 
 
-			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,commit=120,subvol=@      		$linuxpartition /mnt
+			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@      		$linuxpartition /mnt
 			mkdir -p /mnt/{.snapshots,home,root,srv,var/log,var/cache,tmp}
 
 			# I'm setting options manually otherwise it will set some options automatically (this will reflect in /etc/fstab)
-			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,commit=120,subvol=@home  		$linuxpartition /mnt/home
-			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,commit=120,subvol=@root  		$linuxpartition /mnt/root
-			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,commit=120,subvol=@srv   		$linuxpartition /mnt/srv
-			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,commit=120,subvol=@log   		$linuxpartition /mnt/var/log
-			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,commit=120,subvol=@cache 		$linuxpartition /mnt/var/cache
-			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,commit=120,subvol=@tmp   		$linuxpartition /mnt/tmp
-			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,commit=120,subvol=@snapshots   	$linuxpartition /mnt/.snapshots
+			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@home  		$linuxpartition /mnt/home
+			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@root  		$linuxpartition /mnt/root
+			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@srv   		$linuxpartition /mnt/srv
+			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@log   		$linuxpartition /mnt/var/log
+			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@cache 		$linuxpartition /mnt/var/cache
+			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@tmp   		$linuxpartition /mnt/tmp
+			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@snapshots   	$linuxpartition /mnt/.snapshots
 			##### others option you can use above #####
 			# ssd, ==> if you are using the ssd
 			#
@@ -158,6 +158,7 @@ sleep 10s #check all correct above
 			## you can use any number of compression b/w 1 to 19 
 			#
 			# discard=async,space_cache=v2, ==>>> if you dont add this option it will automatically be added in /etc/fstab
+			# autodefrag ===>> will automatically defrag your btrfs file system :)
 			
 
 	mkdir -p /mnt/boot/efi
@@ -169,13 +170,15 @@ lsblk
 sleep 5s
 
 
-pacstrap /mnt base base-devel linux-zen linux-firmware vim btrfs-progs
+### what kernal do you want to use
 # what ever the linux kernal you are using here you also need to change it in mkinitcpio and linux-headers if you are using it
-# linux
-# linux-hardened
-# linux-lts
-# linux-zen       # its removing my display blinking issue
+# myKernal="linux"
+# myKernal="linux-hardened"
+# myKernal="linux-lts"
+myKernal="linux-zen"       # its removing my display blinking issue
 
+pacstrap /mnt base base-devel $myKernal linux-firmware vim btrfs-progs
+   
 genfstab -U -p /mnt >> /mnt/etc/fstab
 # The -p flag include all the partitions including those that are not currently mounted... -U flags tells use UUID in fstab
 #cat /mnt/etc/fstab   (to check fstab is correcto to not)
@@ -272,9 +275,9 @@ echo "write HostName/username of the OS(tv): "
 read hostname
 echo $hostname > /etc/hostname
 
-echo "127.0.0.1       localhost" 						>> /etc/hosts
-echo "::1             localhost" 						>> /etc/hosts
-echo "127.0.1.1       $hostname.localdomain $hostname" 	>> /etc/hosts
+echo "127.0.0.1       localhost" >> /etc/hosts
+echo "::1             localhost" >> /etc/hosts
+echo "127.0.1.1       $hostname.localdomain $hostname" >> /etc/hosts
 
 
 echo "##########################################################################"
@@ -364,7 +367,7 @@ echo "##########################################################################
 # mkinitcpio -p linux
 
 sed -i "s/MODULES=()/MODULES=(btrfs)/" /etc/mkinitcpio.conf
-mkinitcpio -p linux-zen
+mkinitcpio -p $myKernal
 
 #btrfs crc32c-intel
 
