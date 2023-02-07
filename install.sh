@@ -124,42 +124,40 @@ mkfs.btrfs $linuxpartition -f   ###-f = forcefully if any error there
 
 sleep 10s #check all correct above
 	mount $linuxpartition /mnt
-			btrfs su cr /mnt/@
-			btrfs su cr /mnt/@home
-			btrfs su cr /mnt/@root
-			btrfs su cr /mnt/@srv
-			btrfs su cr /mnt/@log
-			btrfs su cr /mnt/@cache
-			btrfs su cr /mnt/@tmp
-			btrfs su cr /mnt/@snapshots
-			btrfs su li /mnt 
+	
+	btrfs su cr /mnt/@
+	btrfs su cr /mnt/@home
+	btrfs su cr /mnt/@root
+	btrfs su cr /mnt/@srv
+	btrfs su cr /mnt/@var
+	btrfs su cr /mnt/@tmp
+	btrfs su cr /mnt/@snapshots
+	btrfs su li /mnt 
 
-			cd /
-			umount /mnt 
+	umount /mnt 
 
-			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@      		$linuxpartition /mnt
-			mkdir -p /mnt/{.snapshots,home,root,srv,var/log,var/cache,tmp}
+	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@      	$linuxpartition /mnt
+	mkdir -p /mnt/{home,root,srv,var,tmp,.snapshots}
 
-			# I'm setting options manually otherwise it will set some options automatically (this will reflect in /etc/fstab)
-			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@home  		$linuxpartition /mnt/home
-			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@root  		$linuxpartition /mnt/root
-			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@srv   		$linuxpartition /mnt/srv
-			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@log   		$linuxpartition /mnt/var/log
-			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@cache 		$linuxpartition /mnt/var/cache
-			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@tmp   		$linuxpartition /mnt/tmp
-			mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@snapshots   	$linuxpartition /mnt/.snapshots
-			##### others option you can use above #####
-			# ssd, ==> if you are using the ssd
-			#
-			# compress=zstd (auto select compression level) (automatically and recommended) <<<=====================
-			# compress=zstd:3 (good for HDD)(compress almost all files expect some)(low compression faster R/W speed) 
-			# compress-force=zstd:15 (good for SSD)(compress all files forcefully)(high compression low R/W speed)
-			## if you are storing mp3,mp4,zip it's better to use low or no compression because files are already compressed
-			## you can use any number of compression b/w 1 to 19 
-			#
-			# discard=async,space_cache=v2, ==>>> if you dont add this option it will automatically be added in /etc/fstab
-			# autodefrag ===>> will automatically defrag your btrfs file system :)
-			
+	# I'm setting options manually otherwise it will set some options automatically (this will reflect in /etc/fstab)
+	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@home  	$linuxpartition /mnt/home
+	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@root  	$linuxpartition /mnt/root
+	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@srv   	$linuxpartition /mnt/srv
+	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@var   	$linuxpartition /mnt/var
+	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@tmp   	$linuxpartition /mnt/tmp
+	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@snapshots   	$linuxpartition /mnt/.snapshots
+	##### others option you can use above #####
+	# ssd, ==> if you are using the ssd
+	#
+	# compress=zstd (auto select compression level) (automatically and recommended) <<<=====================
+	# compress=zstd:3 (good for HDD)(compress almost all files expect some)(low compression faster R/W speed) 
+	# compress-force=zstd:15 (good for SSD)(compress all files forcefully)(high compression low R/W speed)
+	## if you are storing mp3,mp4,zip it's better to use low or no compression because files are already compressed
+	## you can use any number of compression b/w 1 to 19 
+	#
+	# discard=async,space_cache=v2, ==>>> if you dont add this option it will automatically be added in /etc/fstab
+	# autodefrag ===>> will automatically defrag your btrfs file system :)
+	
 
 	mkdir -p /mnt/boot/efi
 	mount $bootpartition /mnt/boot/efi
