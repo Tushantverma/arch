@@ -153,10 +153,11 @@ sleep 10s #check all correct above
 	# compress=zstd:3 (good for HDD)(compress almost all files expect some)(low compression faster R/W speed) 
 	# compress-force=zstd:15 (good for SSD)(compress all files forcefully)(high compression low R/W speed)
 	## if you are storing mp3,mp4,zip it's better to use low or no compression because files are already compressed
-	## you can use any number of compression b/w 1 to 19 
+	## you can use any number of compression b/w 1 to 15 
 	#
 	# discard=async,space_cache=v2, ==>>> if you dont add this option it will automatically be added in /etc/fstab
 	# autodefrag ===>> will automatically defrag your btrfs file system :)
+	# @var ===>> this subvolume is fixing timeshift snapshots not deleting error :)
 	
 
 	mkdir -p /mnt/boot/efi
