@@ -409,6 +409,26 @@ systemctl enable NetworkManager
 
 
 echo "##########################################################################"
+echo "############### setting up auto temporary file cleanup ###################"
+echo "##########################################################################"
+
+echo "
+## always enable /tmp directory cleaning (deleting /tmp files after every boot)
+D! /tmp 1777 root root 0
+
+## remove files in /var/tmp older than 2 days
+D /var/tmp 1777 root root 2d
+
+## namespace mountpoints (PrivateTmp=yes) are excluded from removal
+x /tmp/systemd-private-*
+x /var/tmp/systemd-private-*
+X /tmp/systemd-private-*/tmp
+X /var/tmp/systemd-private-*/tmp" > /etc/tmpfiles.d/tmp.conf
+
+
+
+
+echo "##########################################################################"
 echo "########################## installing display manager ####################"
 echo "##########################################################################"
 
