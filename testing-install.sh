@@ -135,28 +135,28 @@ sleep 10s #check all correct above
 
 
 		btrfs su cr /mnt/@ 
-		btrfs su cr /mnt/@/.snapshots 
-		btrfs su cr /mnt/@/home 
-		btrfs su cr /mnt/@/root 
-		btrfs su cr /mnt/@/srv 
-		btrfs su cr /mnt/@/var_log 
-		btrfs su cr /mnt/@/var_cache 
-		btrfs su cr /mnt/@/var_tmp 
+		btrfs su cr /mnt/@.snapshots 
+		btrfs su cr /mnt/@home 
+		btrfs su cr /mnt/@root 
+		btrfs su cr /mnt/@srv 
+		btrfs su cr /mnt/@var_log 
+		btrfs su cr /mnt/@var_cache 
+		btrfs su cr /mnt/@var_tmp 
 		 
 
 		umount /mnt
 
-mount -o noatime,space_cache=v2,compress=zstd,subvol=@/  $linuxpartition /mnt
+mount -o noatime,space_cache=v2,compress=zstd,subvol=@  $linuxpartition /mnt
 
 mkdir -p /mnt/{root,home,.snapshots,srv,/var/log,/var/cache,/var/tmp}
 
-mount -o noatime,space_cache=v2,autodefrag,compress=zstd,discard=async,nodev,nosuid,subvol=@/root $linuxpartition /mnt/root
-mount -o noatime,space_cache=v2,autodefrag,compress=zstd,discard=async,nodev,nosuid,subvol=@/home $linuxpartition /mnt/home
-mount -o noatime,space_cache=v2,autodefrag,compress=zstd,discard=async,subvol=@/.snapshots $linuxpartition /mnt/.snapshots
-mount -o noatime,space_cache=v2.autodefrag,compress=zstd,discard=async,subvol=@/srv $linuxpartition /mnt/srv
-mount -o noatime,space_cache=v2,autodefrag,compress=zstd,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_log $linuxpartition /mnt/var/log
-mount -o noatime,space_cache=v2,autodefrag,compress=zstd,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_cache $linuxpartition /mnt/var/cache
-mount -o noatime,space_cache=v2,autodefrag,compress=zstd,discard=async,nodatacow,nodev,nosuid,subvol=@/var_tmp $linuxpartition /mnt/var/tmp
+mount -o noatime,space_cache=v2,autodefrag,compress=zstd,discard=async,nodev,nosuid,subvol=@root $linuxpartition /mnt/root
+mount -o noatime,space_cache=v2,autodefrag,compress=zstd,discard=async,nodev,nosuid,subvol=@home $linuxpartition /mnt/home
+mount -o noatime,space_cache=v2,autodefrag,compress=zstd,discard=async,subvol=@.snapshots $linuxpartition /mnt/.snapshots
+mount -o noatime,space_cache=v2.autodefrag,compress=zstd,discard=async,subvol=@srv $linuxpartition /mnt/srv
+mount -o noatime,space_cache=v2,autodefrag,compress=zstd,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@var_log $linuxpartition /mnt/var/log
+mount -o noatime,space_cache=v2,autodefrag,compress=zstd,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@var_cache $linuxpartition /mnt/var/cache
+mount -o noatime,space_cache=v2,autodefrag,compress=zstd,discard=async,nodatacow,nodev,nosuid,subvol=@var_tmp $linuxpartition /mnt/var/tmp
 
 
 
