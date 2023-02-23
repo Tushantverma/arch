@@ -129,119 +129,35 @@ mkfs.btrfs $linuxpartition -f   ###-f = forcefully if any error there
 
 
 
-
-
-
-
-
 sleep 10s #check all correct above
 	mount $linuxpartition /mnt
 	
 
 
+		btrfs su cr /mnt/@ 
+		btrfs su cr /mnt/@/.snapshots 
+		btrfs su cr /mnt/@/home 
+		btrfs su cr /mnt/@/root 
+		btrfs su cr /mnt/@/srv 
+		btrfs su cr /mnt/@/var_log 
+		btrfs su cr /mnt/@/var_cache 
+		btrfs su cr /mnt/@/var_tmp 
+		 
 
+		umount /mnt
 
-btrfs su cr /mnt/@ &>/dev/null
-btrfs su cr /mnt/@/.snapshots &>/dev/null
-mkdir -p /mnt/@/.snapshots/1 &>/dev/null
-btrfs su cr /mnt/@/.snapshots/1/snapshot &>/dev/null
-btrfs su cr /mnt/@/boot/ &>/dev/null
-btrfs su cr /mnt/@/home &>/dev/null
-btrfs su cr /mnt/@/root &>/dev/null
-btrfs su cr /mnt/@/srv &>/dev/null
-btrfs su cr /mnt/@/var_log &>/dev/null
-btrfs su cr /mnt/@/var_log_journal &>/dev/null
-btrfs su cr /mnt/@/var_crash &>/dev/null
-btrfs su cr /mnt/@/var_cache &>/dev/null
-btrfs su cr /mnt/@/var_tmp &>/dev/null
-btrfs su cr /mnt/@/var_spool &>/dev/null
-btrfs su cr /mnt/@/var_lib_libvirt_images &>/dev/null
-btrfs su cr /mnt/@/var_lib_machines &>/dev/null
-btrfs su cr /mnt/@/var_lib_gdm &>/dev/null
-btrfs su cr /mnt/@/var_lib_AccountsService &>/dev/null
-btrfs su cr /mnt/@/cryptkey &>/dev/null
+mount -o noatime,space_cache=v2,compress=zstd,subvol=@/  $linuxpartition /mnt
 
+mkdir -p /mnt/{root,home,.snapshots,srv,/var/log,/var/cache,/var/tmp}
 
+mount -o noatime,space_cache=v2,autodefrag,compress=zstd,discard=async,nodev,nosuid,subvol=@/root $linuxpartition /mnt/root
+mount -o noatime,space_cache=v2,autodefrag,compress=zstd,discard=async,nodev,nosuid,subvol=@/home $linuxpartition /mnt/home
+mount -o noatime,space_cache=v2,autodefrag,compress=zstd,discard=async,subvol=@/.snapshots $linuxpartition /mnt/.snapshots
+mount -o noatime,space_cache=v2.autodefrag,compress=zstd,discard=async,subvol=@/srv $linuxpartition /mnt/srv
+mount -o noatime,space_cache=v2,autodefrag,compress=zstd,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_log $linuxpartition /mnt/var/log
+mount -o noatime,space_cache=v2,autodefrag,compress=zstd,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_cache $linuxpartition /mnt/var/cache
+mount -o noatime,space_cache=v2,autodefrag,compress=zstd,discard=async,nodatacow,nodev,nosuid,subvol=@/var_tmp $linuxpartition /mnt/var/tmp
 
-
-
-chattr +C /mnt/@/boot
-chattr +C /mnt/@/srv
-chattr +C /mnt/@/var_log
-chattr +C /mnt/@/var_log_journal
-chattr +C /mnt/@/var_crash
-chattr +C /mnt/@/var_cache
-chattr +C /mnt/@/var_tmp
-chattr +C /mnt/@/var_spool
-chattr +C /mnt/@/var_lib_libvirt_images
-chattr +C /mnt/@/var_lib_machines
-chattr +C /mnt/@/var_lib_gdm
-chattr +C /mnt/@/var_lib_AccountsService
-chattr +C /mnt/@/cryptkey
-
-
-
-
-#Set the default BTRFS Subvol to Snapshot 1 before pacstrapping
-btrfs subvolume set-default "$(btrfs subvolume list /mnt | grep "@/.snapshots/1/snapshot" | grep -oP '(?<=ID )[0-9]+')" /mnt
-
-
-
-
-
-cat << EOF >> /mnt/@/.snapshots/1/info.xml
-<?xml version="1.0"?>
-<snapshot>
-  <type>single</type>
-  <num>1</num>
-  <date>1999-03-31 0:00:00</date>
-  <description>First Root Filesystem</description>
-  <cleanup>number</cleanup>
-</snapshot>
-EOF
-
-
-
-
-
-chmod 600 /mnt/@/.snapshots/1/info.xml
-
-# Mounting the newly created subvolumes.
-umount /mnt
-
-echo "Mounting the newly created subvolumes."
-mount -o ssd,noatime,space_cache,compress=zstd:15 $linuxpartition /mnt
-
-mkdir -p /mnt/{boot,root,home,.snapshots,srv,tmp,/var/log,/var/crash,/var/cache,/var/tmp,/var/spool,/var/lib/libvirt/images,/var/lib/machines,/var/lib/gdm,/var/lib/AccountsService,/cryptkey}
-
-mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodev,nosuid,noexec,subvol=@/boot $linuxpartition /mnt/boot
-mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodev,nosuid,subvol=@/root $linuxpartition /mnt/root
-mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodev,nosuid,subvol=@/home $linuxpartition /mnt/home
-mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,subvol=@/.snapshots $linuxpartition /mnt/.snapshots
-mount -o ssd,noatime,space_cache=v2.autodefrag,compress=zstd:15,discard=async,subvol=@/srv $linuxpartition /mnt/srv
-mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_log $linuxpartition /mnt/var/log
-
-# Toolbox (https://github.com/containers/toolbox) needs /var/log/journal to have dev, suid, and exec, Thus I am splitting the subvolume. Need to make the directory after /mnt/var/log/ has been mounted.
-mkdir -p /mnt/var/log/journal
-mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,subvol=@/var_log_journal $linuxpartition /mnt/var/log/journal
-
-mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_crash $linuxpartition /mnt/var/crash
-mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_cache $linuxpartition /mnt/var/cache
-
-# Pamac needs /var/tmp to have exec. Thus I am not adding that flag.
-# I am considering including pacmac-flatpak-gnome AUR package by default, since I am its maintainer.
-mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,subvol=@/var_tmp $linuxpartition /mnt/var/tmp
-
-mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_spool $linuxpartition /mnt/var/spool
-mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_libvirt_images $linuxpartition /mnt/var/lib/libvirt/images
-mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_machines $linuxpartition /mnt/var/lib/machines
-
-# GNOME requires /var/lib/gdm and /var/lib/AccountsService to be writeable when booting into a readonly snapshot. Thus we sadly have to split them.
-mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_gdm $linuxpartition /mnt/var/lib/gdm
-mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_AccountsService $linuxpartition /mnt/var/lib/AccountsService
-
-# The encryption is splitted as we do not want to include it in the backup with snap-pac.
-mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/cryptkey $linuxpartition /mnt/cryptkey
 
 
 
@@ -284,7 +200,7 @@ sleep 5s
 
 # create a new script which starts with #part2 
 # runing the #part2 of script in arch-chroot
-sed "1,/^#part22$/d" ~/arch/install.sh > /mnt/install2.sh 
+sed "1,/^#part22$/d" ~/arch/testing-install.sh > /mnt/install2.sh 
 chmod +x /mnt/install2.sh
 arch-chroot /mnt ./install2.sh
 
