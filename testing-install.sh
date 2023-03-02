@@ -128,18 +128,24 @@ sleep 10s #check all correct above
 	btrfs su cr /mnt/@
 	btrfs su cr /mnt/@home
 	btrfs su cr /mnt/@opt
+	btrfs su cr /mnt/@var
 	btrfs su cr /mnt/@tmp
 	btrfs su li /mnt 
 
 	umount /mnt 
 
-	mount -o noatime,commit=120,compress=zstd,space_cache,subvol=@    	$linuxpartition /mnt
-	mkdir -p /mnt/{home,opt,tmp}
+
+	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@      	$linuxpartition /mnt
+	mkdir -p /mnt/{home,opt,var,tmp}
 
 	# I'm setting options manually otherwise it will set some options automatically (this will reflect in /etc/fstab)
-	mount -o noatime,commit=120,compress=zstd,space_cache,subvol=@home  	$linuxpartition /mnt/home
-	mount -o noatime,commit=120,compress=zstd,space_cache,subvol=@opt 		$linuxpartition /mnt/opt
-	mount -o noatime,commit=120,compress=zstd,space_cache,subvol=@tmp 		$linuxpartition /mnt/tmp
+	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@home  	$linuxpartition /mnt/home
+	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@opt  	$linuxpartition /mnt/opt
+	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@var   	$linuxpartition /mnt/var
+	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@tmp   	$linuxpartition /mnt/tmp
+
+
+
 
 	##### others option you can use above #####
 	# ssd, ==> if you are using the ssd
