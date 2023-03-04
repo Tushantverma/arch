@@ -498,7 +498,7 @@ echo "##########################################################################
 hypervisor=$(systemd-detect-virt)
     case $hypervisor in
     	none )      echo "main machine is detected"
-		            pacman -S --noconfirm picom 
+		            pacman --noconfirm -S picom 
                     ;;
         kvm )  	    echo "KVM has been detected, setting up guest tools."
                	    #pacstrap /mnt qemu-guest-agent &>/dev/null
@@ -510,7 +510,7 @@ hypervisor=$(systemd-detect-virt)
                     #systemctl enable vmware-vmblock-fuse --root=/mnt &>/dev/null
                     ;;
         oracle )    echo "VirtualBox has been detected, setting up guest tools."
-                    pacman -S virtualbox-guest-utils 
+                    pacman --noconfirm -S virtualbox-guest-utils 
                     systemctl enable vboxservice.service
                     ;;
         microsoft ) echo "Hyper-V has been detected, setting up guest tools."
