@@ -160,6 +160,12 @@ sleep 10s #check all correct above
 	# @var ===>> this subvolume is fixing timeshift snapshots not deleting error :)
 	
 
+	# fixing timeshift snapshot not deleting error | will maybe break systemd-nspawn but docker is a good alternative
+	btrfs subvolume delete /mnt/var/lib/{machines,portables}
+	mkdir -p /mnt/var/lib/{machines,portables} # creating regular directory at there place
+
+
+
 	mkdir -p /mnt/boot/efi
 	mount $bootpartition /mnt/boot/efi
 
@@ -194,7 +200,7 @@ sleep 5s
 
 # create a new script which starts with #part2 
 # runing the #part2 of script in arch-chroot
-sed "1,/^#part22$/d" ~/arch/install.sh > /mnt/install2.sh 
+sed "1,/^#part22$/d" ~/arch/testing-install.sh > /mnt/install2.sh 
 chmod +x /mnt/install2.sh
 arch-chroot /mnt ./install2.sh
 
@@ -481,7 +487,39 @@ rm -rf arcolinux-spices
 # source :- https://www.arcolinux.info/arcolinux-spices-application/
 
 
-pacman -S --noconfirm sublime-text-4 yay thunar gvfs gvfs-afc thunar-volman tumbler ffmpegthumbnailer thunar-archive-plugin thunar-media-tags-plugin pavucontrol gparted mpv pulseaudio pulseaudio-alsa ntfs-3g feh alacritty sxhkd rofi ttf-iosevka-nerd polkit-gnome xfce4-power-manager man-db picom fzf xclip
+pacman -S --noconfirm sublime-text-4 yay thunar gvfs gvfs-afc thunar-volman tumbler ffmpegthumbnailer thunar-archive-plugin thunar-media-tags-plugin pavucontrol gparted mpv pulseaudio pulseaudio-alsa ntfs-3g feh alacritty sxhkd rofi ttf-iosevka-nerd polkit-gnome xfce4-power-manager man-db fzf xclip
+
+
+
+echo "##########################################################################"
+echo "####################### searching for virtualization #####################"
+echo "##########################################################################"
+
+hypervisor=$(systemd-detect-virt)
+    case $hypervisor in
+    	none )      echo "main machine is detected"
+		            pacman -S picom 
+                    ;;
+        kvm )  	    echo "KVM has been detected, setting up guest tools."
+               	    #pacstrap /mnt qemu-guest-agent &>/dev/null
+                    #systemctl enable qemu-guest-agent --root=/mnt &>/dev/null
+              	    ;;
+        vmware  )   echo "VMWare Workstation/ESXi has been detected, setting up guest tools."
+                    #pacstrap /mnt open-vm-tools >/dev/null
+                    #systemctl enable vmtoolsd --root=/mnt &>/dev/null
+                    #systemctl enable vmware-vmblock-fuse --root=/mnt &>/dev/null
+                    ;;
+        oracle )    echo "VirtualBox has been detected, setting up guest tools."
+                    pacman -S virtualbox-guest-utils 
+                    systemctl enable vboxservice.service
+                    ;;
+        microsoft ) echo "Hyper-V has been detected, setting up guest tools."
+                    #pacstrap /mnt hyperv &>/dev/null
+                    #systemctl enable hv_fcopy_daemon --root=/mnt &>/dev/null
+                    #systemctl enable hv_kvp_daemon --root=/mnt &>/dev/null
+                    #systemctl enable hv_vss_daemon --root=/mnt &>/dev/null
+                    ;;
+    esac
 
 echo "part2 is DONE here"
 
