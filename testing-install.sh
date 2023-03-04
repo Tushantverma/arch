@@ -498,7 +498,7 @@ echo "##########################################################################
 hypervisor=$(systemd-detect-virt)
     case $hypervisor in
     	none )      echo "main machine is detected"
-		            pacman --noconfirm -S picom 
+		            pacman -S --noconfirm picom 
                     ;;
         kvm )  	    echo "KVM has been detected, setting up guest tools."
                	    #pacstrap /mnt qemu-guest-agent &>/dev/null
