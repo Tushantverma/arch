@@ -161,7 +161,7 @@ sleep 10s #check all correct above
 	
 
 	# fixing timeshift snapshot not deleting error | will maybe break systemd-nspawn but docker is a good alternative
-	btrfs subvolume delete /mnt/var/lib/{machines,portables}
+	# btrfs subvolume delete /mnt/var/lib/{machines,portables}
 	mkdir -p /mnt/var/lib/{machines,portables} # creating regular directory at there place
 
 
@@ -210,7 +210,7 @@ sleep 10s
 rm -rf /mnt/install2.sh
 umount -R /mnt
 
-echo "installaion DONE you can reboot now"
+echo "installaion DONE you can reboot now or ##arch-chroot /mnt"
 exit
 
 
@@ -487,7 +487,7 @@ rm -rf arcolinux-spices
 # source :- https://www.arcolinux.info/arcolinux-spices-application/
 
 
-pacman -S --noconfirm sublime-text-4 yay thunar gvfs gvfs-afc thunar-volman tumbler ffmpegthumbnailer thunar-archive-plugin thunar-media-tags-plugin pavucontrol gparted mpv pulseaudio pulseaudio-alsa ntfs-3g feh alacritty sxhkd rofi ttf-iosevka-nerd polkit-gnome xfce4-power-manager man-db fzf xclip
+pacman -S --noconfirm sublime-text-4 yay thunar gvfs gvfs-afc thunar-volman tumbler ffmpegthumbnailer thunar-archive-plugin thunar-media-tags-plugin pavucontrol gparted mpv pulseaudio pulseaudio-alsa ntfs-3g feh alacritty sxhkd rofi ttf-iosevka-nerd polkit-gnome xfce4-power-manager man-db fzf xclip chezmoi
 
 
 
@@ -498,7 +498,7 @@ echo "##########################################################################
 hypervisor=$(systemd-detect-virt)
     case $hypervisor in
     	none )      echo "main machine is detected"
-		            pacman -S picom 
+		            pacman --noconfirm -S picom 
                     ;;
         kvm )  	    echo "KVM has been detected, setting up guest tools."
                	    #pacstrap /mnt qemu-guest-agent &>/dev/null
