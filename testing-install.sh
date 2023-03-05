@@ -487,7 +487,7 @@ rm -rf arcolinux-spices
 # source :- https://www.arcolinux.info/arcolinux-spices-application/
 
 
-pacman -S --noconfirm sublime-text-4 yay thunar gvfs gvfs-afc thunar-volman tumbler ffmpegthumbnailer thunar-archive-plugin thunar-media-tags-plugin pavucontrol gparted mpv pulseaudio pulseaudio-alsa ntfs-3g feh alacritty sxhkd rofi ttf-iosevka-nerd polkit-gnome xfce4-power-manager man-db fzf xclip chezmoi
+pacman -S --noconfirm sublime-text-4 yay thunar gvfs gvfs-afc thunar-volman tumbler ffmpegthumbnailer thunar-archive-plugin thunar-media-tags-plugin pavucontrol gparted mpv pulseaudio pulseaudio-alsa ntfs-3g feh alacritty sxhkd rofi ttf-iosevka-nerd polkit-gnome xfce4-power-manager man-db fzf xclip chezmoi tree
 
 
 
@@ -521,29 +521,37 @@ hypervisor=$(systemd-detect-virt)
                     ;;
     esac
 
-echo "part2 is DONE here"
+
+
+
+echo "
+
+
+part2 is DONE here
+
+
+"
 
 
 
 
 
+echo "##########################################################################"
+echo "########################## setting up my config ##########################"
+echo "##########################################################################"
+
+## need learning
+sed "1,/^#part33$/d" install2.sh > /home/$username/install3.sh
+chown $username:$username          /home/$username/install3.sh
+chmod +x   /home/$username/install3.sh
+su -c   /home/$username/install3.sh   -s   /bin/sh $username
+exit
 
 
+#part33
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+chezmoi init --apply https://github.com/tushantverma/dotfiles
+bash  ~/.myscripts/1_setup_all.sh
 
 
 
