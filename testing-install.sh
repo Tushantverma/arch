@@ -276,7 +276,7 @@ echo "##########################################################################
 echo "########################### setting up your HOST #########################"
 echo "##########################################################################"
 
-echo "write HostName/username of the OS(tv): "
+echo "write HostName/NickName for the OS(tv): "
 read hostname
 echo $hostname > /etc/hostname
 
@@ -526,9 +526,7 @@ hypervisor=$(systemd-detect-virt)
 
 echo "
 
-
 part2 is DONE here
-
 
 "
 
@@ -541,18 +539,17 @@ echo "########################## setting up my config ##########################
 echo "##########################################################################"
 
 ## need learning
-sed "1,/^#part33$/d" install2.sh > /home/$username/install3.sh
-chown $username:$username          /home/$username/install3.sh
-chmod +x   /home/$username/install3.sh
-su -c   /home/$username/install3.sh   -s   /bin/sh $username
-exit
+#sed "1,/^#part33$/d" install2.sh > /home/$username/install3.sh
+#chown $username:$username          /home/$username/install3.sh
+#chmod +x   /home/$username/install3.sh
+#su -c   /home/$username/install3.sh   -s   /bin/sh $username
+#exit
 
 
 #part33
 
-chezmoi init --apply https://github.com/tushantverma/dotfiles
-bash  ~/.myscripts/1_setup_all.sh
-
+su - $username -c "chezmoi init --apply https://github.com/tushantverma/dotfiles"
+./home/$username/.myscripts/1_setup_all.sh
 
 
 
