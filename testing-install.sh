@@ -200,7 +200,10 @@ sleep 5s
 
 # create a new script which starts with #part2 
 # runing the #part2 of script in arch-chroot
-sed "1,/^#part22$/d" ~/arch/testing-install.sh > /mnt/install2.sh 
+# sed "1,/^#part22$/d" ~/arch/testing-install.sh > /mnt/install2.sh 
+
+# ${0} means script full path with name which script is executing | where `basename $0` means just script name without path
+sed "1,/^#part22$/d" ${0} > /mnt/install2.sh 
 chmod +x /mnt/install2.sh
 arch-chroot /mnt ./install2.sh
 
