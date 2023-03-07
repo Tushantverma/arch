@@ -200,7 +200,7 @@ sleep 5s
 
 # create a new script which starts with #part2 
 # runing the #part2 of script in arch-chroot
-# sed "1,/^#part22$/d" ~/arch/testing-install.sh > /mnt/install2.sh 
+# sed "1,/^#part22$/d" ~/arch/install.sh > /mnt/install2.sh 
 
 # ${0} means script full path with name which script is executing | where `basename $0` means just script name without path
 sed "1,/^#part22$/d" ${0} > /mnt/install2.sh 
@@ -527,11 +527,7 @@ hypervisor=$(systemd-detect-virt)
 
 
 
-echo "
-
-part2 is DONE here
-
-"
+echo " part2 is DONE here "
 
 
 
@@ -540,13 +536,6 @@ part2 is DONE here
 echo "##########################################################################"
 echo "########################## setting up my config ##########################"
 echo "##########################################################################"
-
-## need learning
-#sed "1,/^#part33$/d" install2.sh > /home/$username/install3.sh
-#chown $username:$username          /home/$username/install3.sh
-#chmod +x   /home/$username/install3.sh
-#su -c   /home/$username/install3.sh   -s   /bin/sh $username
-#exit
 
 
 #part33
