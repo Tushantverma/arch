@@ -144,8 +144,11 @@ sleep 10s #check all correct above
 	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@home  	$linuxpartition /mnt/home
 	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@root  	$linuxpartition /mnt/root
 	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@srv   	$linuxpartition /mnt/srv
+
+	# fixing. pkg rollback fully & properly after snapshot restore ## now you can reinstall same package after restoring the snapshot #timeshift fixed
 	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@var_log   	$linuxpartition /mnt/var/log
 	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@var_pkg   	$linuxpartition /mnt/var/cache/pacman/pkg
+
 	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@tmp   	$linuxpartition /mnt/tmp
 	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@.snapshots   $linuxpartition /mnt/.snapshots
 	##### others option you can use above #####
@@ -164,7 +167,7 @@ sleep 10s #check all correct above
 
 	# fixing timeshift snapshot not deleting error | will maybe break systemd-nspawn but docker is a good alternative
 	# btrfs subvolume delete /mnt/var/lib/{machines,portables}
-	mkdir -p /mnt/var/lib/{machines,portables} # creating regular directory at there place
+	mkdir -p /mnt/var/lib/{machines,portables} # creating regular directory at there place    #timeshift fixed
 
 
 
@@ -189,7 +192,7 @@ pacstrap /mnt base base-devel linux-zen linux-firmware vim btrfs-progs
 genfstab -U -p /mnt >> /mnt/etc/fstab
 # The -p flag include all the partitions including those that are not currently mounted... -U flags tells use UUID in fstab
 #cat /mnt/etc/fstab   (to check fstab is correcto to not)
-sed -i 's#subvolid=[[:digit:]]\+,##g' /mnt/etc/fstab     ### fixing automatically subvolume mount when restoring the snapshots by removing subvolid=256(or any number)
+sed -i 's#subvolid=[[:digit:]]\+,##g' /mnt/etc/fstab     ### fixing automatically subvolume mount when restoring the snapshots by removing subvolid=256(or any number) #timeshift fixed
 
 
 echo "##########################################################################"

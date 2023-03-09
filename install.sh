@@ -129,23 +129,28 @@ sleep 10s #check all correct above
 	btrfs su cr /mnt/@home
 	btrfs su cr /mnt/@root
 	btrfs su cr /mnt/@srv
-	btrfs su cr /mnt/@var
+	btrfs su cr /mnt/@var_log
+	btrfs su cr /mnt/@var_pkg
 	btrfs su cr /mnt/@tmp
-	btrfs su cr /mnt/@snapshots
+	btrfs su cr /mnt/@.snapshots
 	btrfs su li /mnt 
 
 	umount /mnt 
 
 	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@      	$linuxpartition /mnt
-	mkdir -p /mnt/{home,root,srv,var,tmp,.snapshots}
+	mkdir -p /mnt/{home,root,srv,var/{log,cache/pacman/pkg},tmp,.snapshots}
 
 	# I'm setting options manually otherwise it will set some options automatically (this will reflect in /etc/fstab)
 	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@home  	$linuxpartition /mnt/home
 	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@root  	$linuxpartition /mnt/root
 	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@srv   	$linuxpartition /mnt/srv
-	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@var   	$linuxpartition /mnt/var
+
+	# fixing. pkg rollback fully & properly after snapshot restore ## now you can reinstall same package after restoring the snapshot #timeshift fixed
+	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@var_log   	$linuxpartition /mnt/var/log
+	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@var_pkg   	$linuxpartition /mnt/var/cache/pacman/pkg
+
 	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@tmp   	$linuxpartition /mnt/tmp
-	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@snapshots   	$linuxpartition /mnt/.snapshots
+	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@.snapshots   $linuxpartition /mnt/.snapshots
 	##### others option you can use above #####
 	# ssd, ==> if you are using the ssd
 	#
@@ -162,7 +167,7 @@ sleep 10s #check all correct above
 
 	# fixing timeshift snapshot not deleting error | will maybe break systemd-nspawn but docker is a good alternative
 	# btrfs subvolume delete /mnt/var/lib/{machines,portables}
-	mkdir -p /mnt/var/lib/{machines,portables} # creating regular directory at there place
+	mkdir -p /mnt/var/lib/{machines,portables} # creating regular directory at there place    #timeshift fixed
 
 
 
@@ -187,7 +192,7 @@ pacstrap /mnt base base-devel linux-zen linux-firmware vim btrfs-progs
 genfstab -U -p /mnt >> /mnt/etc/fstab
 # The -p flag include all the partitions including those that are not currently mounted... -U flags tells use UUID in fstab
 #cat /mnt/etc/fstab   (to check fstab is correcto to not)
-sed -i 's#subvolid=[[:digit:]]\+,##g' /mnt/etc/fstab     ### fixing automatically subvolume mount when restoring the snapshots by removing subvolid=256(or any number)
+sed -i 's#subvolid=[[:digit:]]\+,##g' /mnt/etc/fstab     ### fixing automatically subvolume mount when restoring the snapshots by removing subvolid=256(or any number) #timeshift fixed
 
 
 echo "##########################################################################"
