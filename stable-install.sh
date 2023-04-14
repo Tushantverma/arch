@@ -388,7 +388,7 @@ mkinitcpio -p linux-zen
 
 
 echo "##########################################################################"
-echo "########################## createing New USER ############################"
+echo "########################## creating New USER ############################"
 echo "##########################################################################"
 
 echo "Enter Your Username : "
@@ -441,9 +441,25 @@ X /var/tmp/systemd-private-*/tmp" > /etc/tmpfiles.d/tmp.conf
 
 
 
+echo "##########################################################################"
+echo "################# setting up touchpad configuration ######################"
+echo "##########################################################################"
+
+echo '
+Section "InputClass"
+    Identifier "touchpad"
+    Driver "libinput"
+    MatchIsTouchpad "on"                # apply config only on touchpad
+    Option "Tapping" "on"               # enable tap
+    Option "ClickMethod" "clickfinger2" # double tap == right click
+    Option "NaturalScrolling" "on"
+    Option "DisableWhileTyping" "true"
+EndSection ' > /etc/X11/xorg.conf.d/30-touchpad.conf
+
+
 
 echo "##########################################################################"
-echo "########################## installing display manager ####################"
+echo "##################### installing display manager #########################"
 echo "##########################################################################"
 
 # $startx (how to use) or $startx awesome
@@ -495,8 +511,7 @@ rm -rf arcolinux-spices
 # source :- https://www.arcolinux.info/arcolinux-spices-application/
 
 
-pacman -S --noconfirm sublime-text-4 yay thunar gvfs gvfs-afc thunar-volman tumbler ffmpegthumbnailer thunar-archive-plugin thunar-media-tags-plugin pavucontrol gparted mpv pulseaudio pulseaudio-alsa ntfs-3g feh alacritty sxhkd rofi ttf-iosevka-nerd polkit-gnome xfce4-power-manager man-db fzf xclip chezmoi tree
-
+pacman -S --noconfirm sublime-text-4 yay thunar gvfs gvfs-afc thunar-volman tumbler ffmpegthumbnailer thunar-archive-plugin thunar-media-tags-plugin pavucontrol gparted mpv pulseaudio pulseaudio-alsa ntfs-3g feh alacritty sxhkd rofi ttf-iosevka-nerd ttf-indic-otf polkit-gnome xfce4-power-manager man-db fzf xclip chezmoi tree tldr light alsa-utils net-tools wireless_tools
 
 
 echo "##########################################################################"
