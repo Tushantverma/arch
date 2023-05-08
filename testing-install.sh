@@ -305,17 +305,22 @@ echo "##########################################################################
 echo "###################### install all needed packages #######################"
 echo "##########################################################################"
 
-pacman -S --noconfirm grub grub-btrfs efibootmgr networkmanager network-manager-applet os-prober bash-completion git dosfstools mtools
+
+pacman -S --noconfirm xorg-server xorg-apps xorg-xinit mesa intel-ucode \
+				grub grub-btrfs efibootmgr networkmanager network-manager-applet os-prober bash-completion git dosfstools mtools \
+ 				bat htop neofetch sublime-text-4 yay thunar gvfs gvfs-afc thunar-volman tumbler ffmpegthumbnailer thunar-archive-plugin thunar-media-tags-plugin pavucontrol gparted mpv pulseaudio pulseaudio-alsa ntfs-3g feh xfce4-terminal sxhkd rofi ttf-iosevka-nerd ttf-indic-otf polkit-gnome man-db fzf xclip chezmoi tree tldr light alsa-utils net-tools wireless_tools file-roller yt-dlp
+
+
+
+##### graphic packages ######
+# xorg-server xorg-apps xorg-xinit mesa intel-ucode
+# xf86-video-intel ## not installing this pkg because its changing display name error for other pkg (eg. vibrent-linux)
+
+##### system packages ######
+# grub grub-btrfs efibootmgr networkmanager network-manager-applet os-prober bash-completion git dosfstools mtools
 # not installing right now ==>  linux-headers-lts linux-lts mtools dialogs dosfstools reflector
 # dosfstools mtools ===>>> is required by gparted
 
-### installing graphic packages ######
-pacman -S --noconfirm xorg-server xorg-apps xorg-xinit mesa intel-ucode
-## xf86-video-intel ## not installing this pkg because its changing display name error for other pkg (eg. vibrent-linux)
-
-
-### my packages
-pacman -S --noconfirm bat htop neofetch
 
 
 #### bugs pkg ####
@@ -511,7 +516,6 @@ rm -rf arcolinux-spices
 # source :- https://www.arcolinux.info/arcolinux-spices-application/
 
 
-pacman -S --noconfirm sublime-text-4 yay thunar gvfs gvfs-afc thunar-volman tumbler ffmpegthumbnailer thunar-archive-plugin thunar-media-tags-plugin pavucontrol gparted mpv pulseaudio pulseaudio-alsa ntfs-3g feh xfce4-terminal sxhkd rofi ttf-iosevka-nerd ttf-indic-otf polkit-gnome man-db fzf xclip chezmoi tree tldr light alsa-utils net-tools wireless_tools file-roller 
 
 
 echo "##########################################################################"
