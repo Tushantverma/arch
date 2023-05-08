@@ -511,7 +511,7 @@ rm -rf arcolinux-spices
 # source :- https://www.arcolinux.info/arcolinux-spices-application/
 
 
-pacman -S --noconfirm sublime-text-4 yay thunar gvfs gvfs-afc thunar-volman tumbler ffmpegthumbnailer thunar-archive-plugin thunar-media-tags-plugin pavucontrol gparted mpv pulseaudio pulseaudio-alsa ntfs-3g feh xfce4-terminal sxhkd rofi ttf-iosevka-nerd ttf-indic-otf polkit-gnome xfce4-power-manager man-db fzf xclip chezmoi tree tldr light alsa-utils net-tools wireless_tools file-roller 
+pacman -S --noconfirm sublime-text-4 yay thunar gvfs gvfs-afc thunar-volman tumbler ffmpegthumbnailer thunar-archive-plugin thunar-media-tags-plugin pavucontrol gparted mpv pulseaudio pulseaudio-alsa ntfs-3g feh xfce4-terminal sxhkd rofi ttf-iosevka-nerd ttf-indic-otf polkit-gnome man-db fzf xclip chezmoi tree tldr light alsa-utils net-tools wireless_tools file-roller 
 
 
 echo "##########################################################################"
