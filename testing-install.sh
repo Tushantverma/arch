@@ -127,7 +127,7 @@ sleep 10s #check all correct above
 	
 	btrfs su cr /mnt/@
 	btrfs su cr /mnt/@home
-	btrfs su cr /mnt/@root
+#	btrfs su cr /mnt/@root
 	btrfs su cr /mnt/@srv
 	btrfs su cr /mnt/@var_log
 	btrfs su cr /mnt/@var_pkg
@@ -138,11 +138,11 @@ sleep 10s #check all correct above
 	umount /mnt 
 
 	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@      	$linuxpartition /mnt
-	mkdir -p /mnt/{home,root,srv,var/{log,cache/pacman/pkg},tmp,.snapshots}
+	mkdir -p /mnt/{home,srv,var/{log,cache/pacman/pkg},tmp,.snapshots} #/mnt/root
 
 	# I'm setting options manually otherwise it will set some options automatically (this will reflect in /etc/fstab)
 	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@home  	$linuxpartition /mnt/home
-	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@root  	$linuxpartition /mnt/root
+#	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@root  	$linuxpartition /mnt/root
 	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@srv   	$linuxpartition /mnt/srv
 
 	# fixing. pkg rollback fully & properly after snapshot restore ## now you can reinstall same package after restoring the snapshot #timeshift fixed
