@@ -187,7 +187,7 @@ sleep 5s
 # linux-lts
 # linux-zen      # its removing my display blinking issue
 
-pacstrap /mnt base base-devel linux-zen linux-firmware vim btrfs-progs
+pacstrap /mnt base base-devel linux-zen linux-firmware neovim btrfs-progs
    
 genfstab -U -p /mnt >> /mnt/etc/fstab
 # The -p flag include all the partitions including those that are not currently mounted... -U flags tells use UUID in fstab
@@ -405,7 +405,7 @@ passwd $username
 sed -i "s/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/" /etc/sudoers
 
 #### or ####
-#EDITOR=vim visudo
+#EDITOR=nvim visudo    #### and you should not use "#EDITOR=neovim visudo"
 #	%wheel ALL=(ALL:ALL) ALL    (uncomment this line)(ALL)
 
 
