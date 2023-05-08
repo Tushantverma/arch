@@ -307,8 +307,8 @@ echo "##########################################################################
 
 
 pacman -S --noconfirm xorg-server xorg-apps xorg-xinit mesa intel-ucode \
-				grub grub-btrfs efibootmgr networkmanager network-manager-applet os-prober bash-completion git dosfstools mtools \
- 				bat htop neofetch sublime-text-4 yay thunar gvfs gvfs-afc thunar-volman tumbler ffmpegthumbnailer thunar-archive-plugin thunar-media-tags-plugin pavucontrol gparted mpv pulseaudio pulseaudio-alsa ntfs-3g feh xfce4-terminal sxhkd rofi ttf-iosevka-nerd ttf-indic-otf polkit-gnome man-db fzf xclip chezmoi tree tldr light alsa-utils net-tools wireless_tools file-roller yt-dlp
+grub grub-btrfs efibootmgr networkmanager network-manager-applet os-prober bash-completion git dosfstools mtools \
+bat htop neofetch sublime-text-4 yay thunar gvfs gvfs-afc thunar-volman tumbler ffmpegthumbnailer thunar-archive-plugin thunar-media-tags-plugin pavucontrol gparted mpv pulseaudio pulseaudio-alsa ntfs-3g feh xfce4-terminal sxhkd rofi ttf-iosevka-nerd ttf-indic-otf polkit-gnome man-db fzf xclip chezmoi tree tldr light alsa-utils net-tools wireless_tools file-roller yt-dlp
 
 
 
