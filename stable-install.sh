@@ -127,7 +127,7 @@ sleep 10s #check all correct above
 	
 	btrfs su cr /mnt/@
 	btrfs su cr /mnt/@home
-	btrfs su cr /mnt/@root
+#	btrfs su cr /mnt/@root
 	btrfs su cr /mnt/@srv
 	btrfs su cr /mnt/@var_log
 	btrfs su cr /mnt/@var_pkg
@@ -138,11 +138,11 @@ sleep 10s #check all correct above
 	umount /mnt 
 
 	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@      	$linuxpartition /mnt
-	mkdir -p /mnt/{home,root,srv,var/{log,cache/pacman/pkg},tmp,.snapshots}
+	mkdir -p /mnt/{home,srv,var/{log,cache/pacman/pkg},tmp,.snapshots} #/mnt/root
 
 	# I'm setting options manually otherwise it will set some options automatically (this will reflect in /etc/fstab)
 	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@home  	$linuxpartition /mnt/home
-	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@root  	$linuxpartition /mnt/root
+#	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@root  	$linuxpartition /mnt/root
 	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@srv   	$linuxpartition /mnt/srv
 
 	# fixing. pkg rollback fully & properly after snapshot restore ## now you can reinstall same package after restoring the snapshot #timeshift fixed
@@ -187,7 +187,7 @@ sleep 5s
 # linux-lts
 # linux-zen      # its removing my display blinking issue
 
-pacstrap /mnt base base-devel linux-zen linux-firmware vim btrfs-progs
+pacstrap /mnt base base-devel linux-zen linux-firmware neovim btrfs-progs
    
 genfstab -U -p /mnt >> /mnt/etc/fstab
 # The -p flag include all the partitions including those that are not currently mounted... -U flags tells use UUID in fstab
@@ -301,21 +301,123 @@ pacman -Syyy --noconfirm sed
 sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 15/" /etc/pacman.conf
 
 
+
+
+echo "##########################################################################"
+echo "#############################(( others ))#################################"
+echo "##########################################################################"
+
+# uncomment multilib in /etc/pacman.conf     [multilib] with sed try
+
+echo " "                                    >> /etc/pacman.conf
+echo "[multilib]"                           >> /etc/pacman.conf
+echo "Include = /etc/pacman.d/mirrorlist"   >> /etc/pacman.conf
+pacman -Syyy
+
+
+# reflector now needed after install it will get mirrorlist form live install to main system
+# check mkinitcpio.conf how to sed and add btrfs module
+
+
+
+
+echo "##########################################################################"
+echo "######################## getting arco key and repo #######################"
+echo "##########################################################################"
+
+pacman -S --noconfirm git
+git clone --depth 1 https://github.com/arcolinux/arcolinux-spices.git
+./arcolinux-spices/usr/share/arcolinux-spices/scripts/get-the-keys-and-repos.sh
+pacman -Syyy
+rm -rf arcolinux-spices
+# source :- https://www.arcolinux.info/arcolinux-spices-application/
+
+
+
+
+
 echo "##########################################################################"
 echo "###################### install all needed packages #######################"
 echo "##########################################################################"
 
-pacman -S --noconfirm grub grub-btrfs efibootmgr networkmanager network-manager-applet os-prober bash-completion git dosfstools mtools
-# not installing right now ==>  linux-headers-lts linux-lts mtools dialogs dosfstools reflector
-# dosfstools mtools ===>>> is required by gparted
+pkgs=(
 
-### installing graphic packages ######
-pacman -S --noconfirm xorg-server xorg-apps xorg-xinit mesa intel-ucode
-## xf86-video-intel ## not installing this pkg because its changing display name error for other pkg (eg. vibrent-linux)
+############### Display pkg ################
+xorg-server
+xorg-apps
+xorg-xinit
+mesa
+intel-ucode
+# xf86-video-intel ## not installing this pkg because its changing display name, giving error for other pkg (eg. vibrent-linux)
 
+grub
+grub-btrfs
+efibootmgr
+networkmanager
+network-manager-applet
+os-prober
+bash-completion
 
-### my packages
-pacman -S --noconfirm bat htop neofetch
+gparted
+dosfstools    # required by gparted
+mtools		  # required by gparted
+
+bat
+htop
+neofetch
+sublime-text-4
+yay
+thunar
+gvfs
+gvfs-afc
+thunar-volman
+tumbler
+ffmpegthumbnailer
+thunar-archive-plugin
+thunar-media-tags-plugin
+pavucontrol
+mpv
+pulseaudio
+pulseaudio-alsa
+ntfs-3g
+feh
+xfce4-terminal
+sxhkd
+rofi
+ttf-iosevka-nerd
+ttf-indic-otf
+polkit-gnome
+man-db
+fzf
+xclip
+chezmoi
+tree
+tldr
+light
+alsa-utils
+net-tools
+wireless_tools
+file-roller
+yt-dlp
+meld
+catfish
+
+#### themes ####
+lxappearance
+qt5ct
+arcolinux-candy-beauty-git
+sweet-cursor-theme-git
+sweet-gtk-theme-dark
+
+# linux-headers-lts
+# linux-lts
+# dialogs
+# reflector
+
+)
+
+pacman -S --noconfirm --needed "${pkgs[@]}"
+
 
 
 #### bugs pkg ####
@@ -405,7 +507,7 @@ passwd $username
 sed -i "s/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/" /etc/sudoers
 
 #### or ####
-#EDITOR=vim visudo
+#EDITOR=nvim visudo    #### and you should not use "#EDITOR=neovim visudo"
 #	%wheel ALL=(ALL:ALL) ALL    (uncomment this line)(ALL)
 
 
@@ -481,37 +583,6 @@ echo "##########################################################################
 # sudo systemctl enable sddm.service
 
 
-
-echo "##########################################################################"
-echo "#############################(( others ))#################################"
-echo "##########################################################################"
-
-# uncomment multilib in /etc/pacman.conf     [multilib] with sed try
-
-echo " "                                    >> /etc/pacman.conf
-echo "[multilib]"                           >> /etc/pacman.conf
-echo "Include = /etc/pacman.d/mirrorlist"   >> /etc/pacman.conf
-pacman -Syyy
-
-
-# reflector now needed after install it will get mirrorlist form live install to main system
-# check mkinitcpio.conf how to sed and add btrfs module
-
-
-
-
-echo "##########################################################################"
-echo "######################## getting arco key and repo #######################"
-echo "##########################################################################"
-
-git clone --depth 1 https://github.com/arcolinux/arcolinux-spices.git
-./arcolinux-spices/usr/share/arcolinux-spices/scripts/get-the-keys-and-repos.sh
-pacman -Syyy
-rm -rf arcolinux-spices
-# source :- https://www.arcolinux.info/arcolinux-spices-application/
-
-
-pacman -S --noconfirm sublime-text-4 yay thunar gvfs gvfs-afc thunar-volman tumbler ffmpegthumbnailer thunar-archive-plugin thunar-media-tags-plugin pavucontrol gparted mpv pulseaudio pulseaudio-alsa ntfs-3g feh alacritty sxhkd rofi ttf-iosevka-nerd ttf-indic-otf polkit-gnome xfce4-power-manager man-db fzf xclip chezmoi tree tldr light alsa-utils net-tools wireless_tools
 
 
 echo "##########################################################################"
