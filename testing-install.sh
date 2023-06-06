@@ -301,25 +301,122 @@ pacman -Syyy --noconfirm sed
 sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 15/" /etc/pacman.conf
 
 
+
+
+echo "##########################################################################"
+echo "#############################(( others ))#################################"
+echo "##########################################################################"
+
+# uncomment multilib in /etc/pacman.conf     [multilib] with sed try
+
+echo " "                                    >> /etc/pacman.conf
+echo "[multilib]"                           >> /etc/pacman.conf
+echo "Include = /etc/pacman.d/mirrorlist"   >> /etc/pacman.conf
+pacman -Syyy
+
+
+# reflector now needed after install it will get mirrorlist form live install to main system
+# check mkinitcpio.conf how to sed and add btrfs module
+
+
+
+
+echo "##########################################################################"
+echo "######################## getting arco key and repo #######################"
+echo "##########################################################################"
+
+git clone --depth 1 https://github.com/arcolinux/arcolinux-spices.git
+./arcolinux-spices/usr/share/arcolinux-spices/scripts/get-the-keys-and-repos.sh
+pacman -Syyy
+rm -rf arcolinux-spices
+# source :- https://www.arcolinux.info/arcolinux-spices-application/
+
+
+
+
+
 echo "##########################################################################"
 echo "###################### install all needed packages #######################"
 echo "##########################################################################"
 
+pkgs=(
 
-pacman -S --noconfirm xorg-server xorg-apps xorg-xinit mesa intel-ucode \
-grub grub-btrfs efibootmgr networkmanager network-manager-applet os-prober bash-completion git dosfstools mtools \
-bat htop neofetch sublime-text-4 yay thunar gvfs gvfs-afc thunar-volman tumbler ffmpegthumbnailer thunar-archive-plugin thunar-media-tags-plugin pavucontrol gparted mpv pulseaudio pulseaudio-alsa ntfs-3g feh xfce4-terminal sxhkd rofi ttf-iosevka-nerd ttf-indic-otf polkit-gnome man-db fzf xclip chezmoi tree tldr light alsa-utils net-tools wireless_tools file-roller yt-dlp
+############### Display pkg ################
+xorg-server
+xorg-apps
+xorg-xinit
+mesa
+intel-ucode
+# xf86-video-intel ## not installing this pkg because its changing display name, giving error for other pkg (eg. vibrent-linux)
 
+grub
+grub-btrfs
+efibootmgr
+networkmanager
+network-manager-applet
+os-prober
+bash-completion
+git
 
+gparted
+dosfstools    # required by gparted
+mtools		  # required by gparted
 
-##### graphic packages ######
-# xorg-server xorg-apps xorg-xinit mesa intel-ucode
-# xf86-video-intel ## not installing this pkg because its changing display name error for other pkg (eg. vibrent-linux)
+bat
+htop
+neofetch
+sublime-text-4
+yay
+thunar
+gvfs
+gvfs-afc
+thunar-volman
+tumbler
+ffmpegthumbnailer
+thunar-archive-plugin
+thunar-media-tags-plugin
+pavucontrol
+mpv
+pulseaudio
+pulseaudio-alsa
+ntfs-3g
+feh
+xfce4-terminal
+sxhkd
+rofi
+ttf-iosevka-nerd
+ttf-indic-otf
+polkit-gnome
+man-db
+fzf
+xclip
+chezmoi
+tree
+tldr
+light
+alsa-utils
+net-tools
+wireless_tools
+file-roller
+yt-dlp
+meld
+catfish
 
-##### system packages ######
-# grub grub-btrfs efibootmgr networkmanager network-manager-applet os-prober bash-completion git dosfstools mtools
-# not installing right now ==>  linux-headers-lts linux-lts mtools dialogs dosfstools reflector
-# dosfstools mtools ===>>> is required by gparted
+#### themes ####
+lxappearance
+qt5ct
+arcolinux-candy-beauty-git
+sweet-cursor-theme-git
+sweet-gtk-theme-dark
+
+# linux-headers-lts
+# linux-lts
+# dialogs
+# reflector
+
+)
+
+pacman -S --noconfirm --needed "${pkgs[@]}"
 
 
 
@@ -484,36 +581,6 @@ echo "##########################################################################
 ### install sddm
 # sudo pacman -S sddm
 # sudo systemctl enable sddm.service
-
-
-
-echo "##########################################################################"
-echo "#############################(( others ))#################################"
-echo "##########################################################################"
-
-# uncomment multilib in /etc/pacman.conf     [multilib] with sed try
-
-echo " "                                    >> /etc/pacman.conf
-echo "[multilib]"                           >> /etc/pacman.conf
-echo "Include = /etc/pacman.d/mirrorlist"   >> /etc/pacman.conf
-pacman -Syyy
-
-
-# reflector now needed after install it will get mirrorlist form live install to main system
-# check mkinitcpio.conf how to sed and add btrfs module
-
-
-
-
-echo "##########################################################################"
-echo "######################## getting arco key and repo #######################"
-echo "##########################################################################"
-
-git clone --depth 1 https://github.com/arcolinux/arcolinux-spices.git
-./arcolinux-spices/usr/share/arcolinux-spices/scripts/get-the-keys-and-repos.sh
-pacman -Syyy
-rm -rf arcolinux-spices
-# source :- https://www.arcolinux.info/arcolinux-spices-application/
 
 
 
