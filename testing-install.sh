@@ -325,6 +325,7 @@ echo "##########################################################################
 echo "######################## getting arco key and repo #######################"
 echo "##########################################################################"
 
+pacman -S git
 git clone --depth 1 https://github.com/arcolinux/arcolinux-spices.git
 ./arcolinux-spices/usr/share/arcolinux-spices/scripts/get-the-keys-and-repos.sh
 pacman -Syyy
@@ -356,7 +357,6 @@ networkmanager
 network-manager-applet
 os-prober
 bash-completion
-git
 
 gparted
 dosfstools    # required by gparted
