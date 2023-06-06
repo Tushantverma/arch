@@ -325,7 +325,7 @@ echo "##########################################################################
 echo "######################## getting arco key and repo #######################"
 echo "##########################################################################"
 
-pacman -S git
+pacman -S --noconfirm git
 git clone --depth 1 https://github.com/arcolinux/arcolinux-spices.git
 ./arcolinux-spices/usr/share/arcolinux-spices/scripts/get-the-keys-and-repos.sh
 pacman -Syyy
