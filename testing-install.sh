@@ -1,6 +1,8 @@
 #!/bin/bash
 
 #setfont ter-128n   #### changing the font size "ter" is a font name and "128n" is the font size
+#screen -h 99999    #### for scrollback on tty while installing OS (99999 is the schrollback buffer)
+
 #part11
 echo "##########################################################################"
 echo "################### checking internet connection #########################"
