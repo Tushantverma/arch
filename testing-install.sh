@@ -360,7 +360,7 @@ bash-completion
 
 gparted
 dosfstools    # required by gparted
-mtools		  # required by gparted
+mtools	      # required by gparted
 
 bat
 htop
@@ -405,7 +405,7 @@ catfish
 #### themes ####
 lxappearance
 qt5ct
-arcolinux-candy-beauty-git
+a-candy-beauty-icon-theme-git
 sweet-cursor-theme-git
 sweet-gtk-theme-dark
 
