@@ -1,6 +1,8 @@
 #!/bin/bash
 
 #setfont ter-128n   #### changing the font size "ter" is a font name and "128n" is the font size
+#screen -h 99999    #### for scrollback on tty while installing OS (99999 is the schrollback buffer) (it's tmux alternative ) eanble scrolling "ctrl + a ["     disable scrolling "esc"
+
 #part11
 echo "##########################################################################"
 echo "################### checking internet connection #########################"
@@ -360,7 +362,7 @@ bash-completion
 
 gparted
 dosfstools    # required by gparted
-mtools		  # required by gparted
+mtools	      # required by gparted
 
 bat
 htop
@@ -405,7 +407,7 @@ catfish
 #### themes ####
 lxappearance
 qt5ct
-arcolinux-candy-beauty-git
+a-candy-beauty-icon-theme-git
 sweet-cursor-theme-git
 sweet-gtk-theme-dark
 

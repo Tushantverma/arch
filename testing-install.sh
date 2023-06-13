@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #setfont ter-128n   #### changing the font size "ter" is a font name and "128n" is the font size
-#screen -h 99999    #### for scrollback on tty while installing OS (99999 is the schrollback buffer) (it's tmux alternative )
+#screen -h 99999    #### for scrollback on tty while installing OS (99999 is the schrollback buffer) (it's tmux alternative ) eanble scrolling "ctrl + a ["     disable scrolling "esc"
 
 #part11
 echo "##########################################################################"
