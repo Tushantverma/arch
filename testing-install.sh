@@ -410,6 +410,8 @@ qt5ct
 a-candy-beauty-icon-theme-git
 sweet-cursor-theme-git
 sweet-gtk-theme-dark
+xcursor-breeze
+arc-blackest-theme-git
 
 # linux-headers-lts
 # linux-lts
