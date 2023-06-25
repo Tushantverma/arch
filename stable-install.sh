@@ -89,7 +89,7 @@ echo "##########################################################################
 echo "######################## partitioning the disk ###########################"
 echo "##########################################################################"
 
-lsblk
+lsblk -p  ## -p => prints full device path
 # $fdisk -l (alternetive shows full drive name with /dev/sdaX) 
 
 echo "#################################"
@@ -100,7 +100,7 @@ echo "Enter the drive (/dev/sda) : "
 read drive
 cfdisk $drive 
 
-lsblk
+lsblk -p  ## -p => prints full device path
 
 ######## how to wipe your file signature/ complete wipe your disk or partition ############
 # wipefs -a /dev/sda  ###(to wipe only all file signature) faster method ===>recommended 
@@ -178,7 +178,7 @@ sleep 10s #check all correct above
 
 
 
-lsblk
+lsblk -p  ## -p => prints full device path
 sleep 5s
 
 
@@ -410,6 +410,8 @@ qt5ct
 a-candy-beauty-icon-theme-git
 sweet-cursor-theme-git
 sweet-gtk-theme-dark
+xcursor-breeze
+arc-blackest-theme-git
 
 # linux-headers-lts
 # linux-lts
