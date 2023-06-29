@@ -216,11 +216,12 @@ arch-chroot /mnt ./install2.sh
 
 # after running the #part2 unmount /mnt and reboot
 echo "unmount /mnt && exit script && removeing /mnt/install2.sh in 10 second"
+echo "you can use ## 'arch-chroot /mnt'  now "
 sleep 10s
 rm -rf /mnt/install2.sh
 umount -R /mnt
 
-echo "installaion DONE you can reboot now or ##arch-chroot /mnt"
+echo "installaion DONE you can reboot now"
 exit
 
 
