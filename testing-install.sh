@@ -182,12 +182,12 @@ lsblk -p  ## -p => prints full device path
 sleep 5s
 
 
-### what kernal do you want to use (i tried to make veriable but not working in chroot in mkinitcpio)
-# what ever the linux kernal you are using here you also need to change it in mkinitcpio and linux-headers if you are using it
+### what kernal do you want to use
+# what ever the linux kernal you are using here you also need to change it in linux-headers if you are using it
 # linux
 # linux-hardened
 # linux-lts
-# linux-zen      # its removing my display blinking issue
+# linux-zen
 
 pacstrap /mnt base base-devel linux-zen linux-firmware neovim btrfs-progs
    
@@ -484,10 +484,12 @@ echo "##########################################################################
 # nano /etc/mkinitcpio.conf
 # MODULES=(btrfs)
 #		 BINARIES=(btrfs) (NOT USING)
-# mkinitcpio -p linux
+# mkinitcpio -p linux ## for specific linux kernal if you have two and more installed
+# mkinitcpio -p       ## for default linux kernal to genrate default config of mkinitcpio
+# mkinitcpio -P       ## for default linux kernal to re-genrate the config of mkinitcpio
 
 sed -i "s/MODULES=()/MODULES=(btrfs)/" /etc/mkinitcpio.conf
-mkinitcpio -p linux-zen
+mkinitcpio -P
 
 #btrfs crc32c-intel
 
