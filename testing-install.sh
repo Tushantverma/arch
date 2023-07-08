@@ -483,10 +483,10 @@ echo "##########################################################################
 
 # nano /etc/mkinitcpio.conf
 # MODULES=(btrfs)
-#		 BINARIES=(btrfs) (NOT USING)
-# mkinitcpio -p linux ## for specific linux kernal if you have two and more installed
-# mkinitcpio -p       ## for default linux kernal to genrate default config of mkinitcpio
-# mkinitcpio -P       ## for default linux kernal to re-genrate the config of mkinitcpio
+# BINARIES=(btrfs) (NOT USING)
+
+# mkinitcpio -p linux ## genrate the default config for mkinitcpio
+# mkinitcpio -P       ## re-genrate the config for mkinitcpio
 
 sed -i "s/MODULES=()/MODULES=(btrfs)/" /etc/mkinitcpio.conf
 mkinitcpio -P
