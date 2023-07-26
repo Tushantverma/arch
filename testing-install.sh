@@ -100,6 +100,7 @@ echo "Enter the drive (/dev/sda) : "
 read drive
 cfdisk $drive 
 
+sleep 5s
 lsblk -p  ## -p => prints full device path
 
 ######## how to wipe your file signature/ complete wipe your disk or partition ############
@@ -387,8 +388,12 @@ feh
 xfce4-terminal
 sxhkd
 rofi
+
+### fonts ###
 ttf-iosevka-nerd
 ttf-indic-otf
+noto-fonts
+
 polkit-gnome
 man-db
 fzf
