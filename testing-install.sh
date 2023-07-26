@@ -195,7 +195,7 @@ pacstrap /mnt base base-devel linux-zen linux-firmware neovim btrfs-progs
 genfstab -U -p /mnt >> /mnt/etc/fstab
 # The -p flag include all the partitions including those that are not currently mounted... -U flags tells use UUID in fstab
 #cat /mnt/etc/fstab   (to check fstab is correcto to not)
-sed -i 's#subvolid=[[:digit:]]\+,##g' /mnt/etc/fstab     ### fixing automatically subvolume mount when restoring the snapshots by removing subvolid=256(or any number) #timeshift fixed
+sed -i 's#subvolid=[[:digit:]]\+,##g' /mnt/etc/fstab     ### fixing automatically subvolume mount when restoring the snapshots by removing subvolid=256(or any number) #timeshift fixed ## you can remove "subvolid" because "subvol" is already there otherwise both would be in conflict
 
 
 echo "##########################################################################"
