@@ -100,6 +100,7 @@ echo "Enter the drive (/dev/sda) : "
 read drive
 cfdisk $drive 
 
+sleep 5s
 lsblk -p  ## -p => prints full device path
 
 ######## how to wipe your file signature/ complete wipe your disk or partition ############
@@ -182,19 +183,19 @@ lsblk -p  ## -p => prints full device path
 sleep 5s
 
 
-### what kernal do you want to use (i tried to make veriable but not working in chroot in mkinitcpio)
-# what ever the linux kernal you are using here you also need to change it in mkinitcpio and linux-headers if you are using it
+### what kernal do you want to use
+# what ever the linux kernal you are using here you also need to change it in linux-headers if you are using it
 # linux
 # linux-hardened
 # linux-lts
-# linux-zen      # its removing my display blinking issue
+# linux-zen
 
 pacstrap /mnt base base-devel linux-zen linux-firmware neovim btrfs-progs
    
 genfstab -U -p /mnt >> /mnt/etc/fstab
 # The -p flag include all the partitions including those that are not currently mounted... -U flags tells use UUID in fstab
 #cat /mnt/etc/fstab   (to check fstab is correcto to not)
-sed -i 's#subvolid=[[:digit:]]\+,##g' /mnt/etc/fstab     ### fixing automatically subvolume mount when restoring the snapshots by removing subvolid=256(or any number) #timeshift fixed
+sed -i 's#subvolid=[[:digit:]]\+,##g' /mnt/etc/fstab     ### fixing automatically subvolume mount when restoring the snapshots by removing subvolid=256(or any number) #timeshift fixed ## you can remove "subvolid" because "subvol" is already there otherwise both would be in conflict
 
 
 echo "##########################################################################"
@@ -216,11 +217,12 @@ arch-chroot /mnt ./install2.sh
 
 # after running the #part2 unmount /mnt and reboot
 echo "unmount /mnt && exit script && removeing /mnt/install2.sh in 10 second"
+echo "you can use ## 'arch-chroot /mnt'  now "
 sleep 10s
 rm -rf /mnt/install2.sh
 umount -R /mnt
 
-echo "installaion DONE you can reboot now or ##arch-chroot /mnt"
+echo "installaion DONE you can reboot now"
 exit
 
 
@@ -386,8 +388,12 @@ feh
 xfce4-terminal
 sxhkd
 rofi
+
+### fonts ###
 ttf-iosevka-nerd
 ttf-indic-otf
+noto-fonts
+
 polkit-gnome
 man-db
 fzf
@@ -482,11 +488,13 @@ echo "##########################################################################
 
 # nano /etc/mkinitcpio.conf
 # MODULES=(btrfs)
-#		 BINARIES=(btrfs) (NOT USING)
-# mkinitcpio -p linux
+# BINARIES=(btrfs) (NOT USING)
+
+# mkinitcpio -p linux-zen ## genrate the default config for mkinitcpio  (this is kernal name)
+# mkinitcpio -P           ## re-genrate the config for mkinitcpio
 
 sed -i "s/MODULES=()/MODULES=(btrfs)/" /etc/mkinitcpio.conf
-mkinitcpio -p linux-zen
+mkinitcpio -P
 
 #btrfs crc32c-intel
 
