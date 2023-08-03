@@ -85,7 +85,7 @@ timedatectl set-ntp true
 
 
 echo "##########################################################################"
-echo "######################## ask all questions at once #######################"
+echo "######## ask all questions at once to export into arch-chroot ############"
 echo "##########################################################################"
 
 read -p "write HostName/NickName for the OS(tv): " hostname && export hostname
@@ -546,7 +546,7 @@ echo "##########################################################################
 echo "########################## starting some deamons #########################"
 echo "##########################################################################"
 
-systemctl enable --now NetworkManager
+systemctl enable NetworkManager     # don't put --now will give you error
 #systemctl enable bluetooth			(enable bluetooth)(IDK)
 #systemctl enable org.cups.cupsd		(enable printer)(IDK)
 
