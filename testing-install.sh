@@ -84,6 +84,18 @@ echo "##########################################################################
 timedatectl set-ntp true
 
 
+echo "##########################################################################"
+echo "######################## ask all questions at once #######################"
+echo "##########################################################################"
+
+read -p "write HostName/NickName for the OS(tv): " hostname && export hostname
+
+read -p "Enter Your UserName : "                   username && export username
+read -p "Enter Your UserPass : "                   userpass && export userpass
+
+read -p "Enter Your RootPass : "                   rootpass && export rootpass
+
+
 
 echo "##########################################################################"
 echo "######################## partitioning the disk ###########################"
@@ -255,6 +267,7 @@ echo "##########################################################################
 
 # setup your timezone
 # file is already in your system you just need to link it with other location
+# time_zone="$(curl --fail https://ipapi.co/timezone)" ### time_zone variable will return your timezone automatically ### Added this from arch wiki https://wiki.archlinux.org/title/System_time
 
 ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime
 #					       <TAB> / <TAB>
@@ -288,8 +301,8 @@ echo "##########################################################################
 echo "########################### setting up your HOST #########################"
 echo "##########################################################################"
 
-echo "write HostName/NickName for the OS(tv): "
-read hostname
+#echo "write HostName/NickName for the OS(tv): "
+#read hostname
 echo $hostname > /etc/hostname
 
 echo "127.0.0.1       localhost" >> /etc/hosts
@@ -444,15 +457,6 @@ pacman -S --noconfirm --needed "${pkgs[@]}"
 #      bluez bluez-utils
 
 
-echo "##########################################################################"
-echo "###################### setting up root user password #####################"
-echo "##########################################################################"
-
-echo "set password for root user"
-passwd
-
-#username: root
-#password:
 
 echo "##########################################################################"
 echo "###################### setting up GRUB BOOTLOADER ########################"
@@ -499,17 +503,30 @@ mkinitcpio -P
 #btrfs crc32c-intel
 
 
+echo "##########################################################################"
+echo "###################### setting up root user password #####################"
+echo "##########################################################################"
+
+#echo "set password for root user"
+#passwd
+
+echo "root:$rootpass" | chpasswd
+
+#usernam: root
+#password:
 
 
 echo "##########################################################################"
 echo "########################## creating New USER ############################"
 echo "##########################################################################"
 
-echo "Enter Your Username : "
-read username
+#echo "Enter Your Username : "
+#read username
 
 useradd -m -g users -G audio,video,network,wheel,storage,rfkill -s /bin/bash $username
-passwd $username
+#passwd $username
+
+echo "$username:$userpass" | chpasswd
 
 
 ## adding user into wheel group ##
@@ -529,7 +546,7 @@ echo "##########################################################################
 echo "########################## starting some deamons #########################"
 echo "##########################################################################"
 
-systemctl enable NetworkManager
+systemctl enable --now NetworkManager
 #systemctl enable bluetooth			(enable bluetooth)(IDK)
 #systemctl enable org.cups.cupsd		(enable printer)(IDK)
 
