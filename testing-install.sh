@@ -36,29 +36,6 @@ sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 15/" /etc/pacman.conf
 
 
 echo "##########################################################################"
-echo "######################### fixing archlinux keyring #######################"
-echo "##########################################################################"
-
-
-pacman --noconfirm -Syyy archlinux-keyring reflector
-reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist
-
-# update your pacman keyring (if you have any issue try billow process one by one)
-# pacman -Syyy
-# pacman-key --init
-# pacman-key --populate
-# pacman-key --refresh-keys
-# pacman -S archlinux-keyring
-# pacman -S reflector
-# 	  mirror='sudo reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist'
-# 	  mirrora='sudo reflector --latest 30 --number 10 --sort age --save /etc/pacman.d/mirrorlist'
-# 	  mirrord='sudo reflector --latest 30 --number 10 --sort delay --save /etc/pacman.d/mirrorlist'
-# 	  mirrors='sudo reflector --latest 30 --number 10 --sort score --save /etc/pacman.d/mirrorlist'
-# 	  mirrorx='sudo reflector --age 6 --latest 20  --fastest 20 --threads 5 --sort rate --protocol https --save /etc/pacman.d/mirrorlist'
-# reboot your system if problem is not fixed
-
-
-echo "##########################################################################"
 echo "###### setting keyboard layout (optional defaulat is already 'us') #######"
 echo "##########################################################################"
 
@@ -85,7 +62,7 @@ timedatectl set-ntp true
 
 
 echo "##########################################################################"
-echo "######## ask all questions at once to export into arch-chroot ############"
+echo "##### assigning all variables at once to export into arch-chroot #########"
 echo "##########################################################################"
 
 read -p "write HostName/NickName for the OS(tv): " hostname && export hostname
@@ -194,6 +171,32 @@ sleep 10s #check all correct above
 lsblk -p  ## -p => prints full device path
 sleep 5s
 
+echo "##########################################################################"
+echo "######################### fixing archlinux keyring #######################"
+echo "##########################################################################"
+
+
+pacman --noconfirm -Syyy archlinux-keyring reflector
+reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist
+
+# update your pacman keyring (if you have any issue try billow process one by one)
+# pacman -Syyy
+# pacman-key --init
+# pacman-key --populate
+# pacman-key --refresh-keys
+# pacman -S archlinux-keyring
+# pacman -S reflector
+# 	  mirror='sudo reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist'
+# 	  mirrora='sudo reflector --latest 30 --number 10 --sort age --save /etc/pacman.d/mirrorlist'
+# 	  mirrord='sudo reflector --latest 30 --number 10 --sort delay --save /etc/pacman.d/mirrorlist'
+# 	  mirrors='sudo reflector --latest 30 --number 10 --sort score --save /etc/pacman.d/mirrorlist'
+# 	  mirrorx='sudo reflector --age 6 --latest 20  --fastest 20 --threads 5 --sort rate --protocol https --save /etc/pacman.d/mirrorlist'
+# reboot your system if problem is not fixed
+
+
+echo "##########################################################################"
+echo "########################## installing base system ########################"
+echo "##########################################################################"
 
 ### what kernal do you want to use
 # what ever the linux kernal you are using here you also need to change it in linux-headers if you are using it
