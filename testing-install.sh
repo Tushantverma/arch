@@ -371,7 +371,7 @@ xorg-server
 xorg-apps
 xorg-xinit
 mesa
-intel-ucode
+intel-ucode  # amd-ucode (for AMD graphics)
 # xf86-video-intel ## not installing this pkg because its changing display name, giving error for other pkg (eg. vibrent-linux)
 
 grub
