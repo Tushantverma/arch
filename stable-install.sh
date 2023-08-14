@@ -36,29 +36,6 @@ sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 15/" /etc/pacman.conf
 
 
 echo "##########################################################################"
-echo "######################### fixing archlinux keyring #######################"
-echo "##########################################################################"
-
-
-pacman --noconfirm -Syyy archlinux-keyring reflector
-reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist
-
-# update your pacman keyring (if you have any issue try billow process one by one)
-# pacman -Syyy
-# pacman-key --init
-# pacman-key --populate
-# pacman-key --refresh-keys
-# pacman -S archlinux-keyring
-# pacman -S reflector
-# 	  mirror='sudo reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist'
-# 	  mirrora='sudo reflector --latest 30 --number 10 --sort age --save /etc/pacman.d/mirrorlist'
-# 	  mirrord='sudo reflector --latest 30 --number 10 --sort delay --save /etc/pacman.d/mirrorlist'
-# 	  mirrors='sudo reflector --latest 30 --number 10 --sort score --save /etc/pacman.d/mirrorlist'
-# 	  mirrorx='sudo reflector --age 6 --latest 20  --fastest 20 --threads 5 --sort rate --protocol https --save /etc/pacman.d/mirrorlist'
-# reboot your system if problem is not fixed
-
-
-echo "##########################################################################"
 echo "###### setting keyboard layout (optional defaulat is already 'us') #######"
 echo "##########################################################################"
 
@@ -82,6 +59,18 @@ echo "################## setting/syncing time with network #####################
 echo "##########################################################################"
 
 timedatectl set-ntp true
+
+
+echo "##########################################################################"
+echo "##### assigning all variables at once to export into arch-chroot #########"
+echo "##########################################################################"
+
+read -p "write HostName/NickName for the OS(tv): " hostname && export hostname
+
+read -p "Enter Your UserName : "                   username && export username
+read -p "Enter Your UserPass : "                   userpass && export userpass
+
+read -p "Enter Your RootPass : "                   rootpass && export rootpass
 
 
 
@@ -132,40 +121,44 @@ sleep 10s #check all correct above
 	btrfs su cr /mnt/@home
 #	btrfs su cr /mnt/@root
 	btrfs su cr /mnt/@srv
-	btrfs su cr /mnt/@var_log
-	btrfs su cr /mnt/@var_pkg
 	btrfs su cr /mnt/@tmp
 	btrfs su cr /mnt/@.snapshots
+	btrfs su cr /mnt/@var_log
+	btrfs su cr /mnt/@var_pkg
+
 	btrfs su li /mnt 
 
 	umount /mnt 
 
-	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@      	$linuxpartition /mnt
+	mountpoint="defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120"
+	mount -o "$mountpoint",subvol=@             $linuxpartition /mnt
 	mkdir -p /mnt/{home,srv,var/{log,cache/pacman/pkg},tmp,.snapshots} #/mnt/root
 
 	# I'm setting options manually otherwise it will set some options automatically (this will reflect in /etc/fstab)
-	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@home  	$linuxpartition /mnt/home
-#	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@root  	$linuxpartition /mnt/root
-	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@srv   	$linuxpartition /mnt/srv
+	mount -o "$mountpoint",subvol=@home         $linuxpartition /mnt/home
+#	mount -o "$mountpoint",subvol=@root         $linuxpartition /mnt/root
+	mount -o "$mountpoint",subvol=@srv          $linuxpartition /mnt/srv
+	mount -o "$mountpoint",subvol=@tmp          $linuxpartition /mnt/tmp
+	mount -o "$mountpoint",subvol=@.snapshots   $linuxpartition /mnt/.snapshots
 
 	# fixing. pkg rollback fully & properly after snapshot restore ## now you can reinstall same package after restoring the snapshot #timeshift fixed
-	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@var_log   	$linuxpartition /mnt/var/log
-	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@var_pkg   	$linuxpartition /mnt/var/cache/pacman/pkg
+	mount -o "$mountpoint",subvol=@var_log      $linuxpartition /mnt/var/log
+	mount -o "$mountpoint",subvol=@var_pkg      $linuxpartition /mnt/var/cache/pacman/pkg
 
-	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@tmp   	$linuxpartition /mnt/tmp
-	mount -o defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120,subvol=@.snapshots   $linuxpartition /mnt/.snapshots
-	##### others option you can use above #####
+
+	##### others option you can use above #######################################################################
 	# ssd, ==> if you are using the ssd
 	#
 	# compress=zstd (auto select compression level) (automatically and recommended) <<<=====================
 	# compress=zstd:3 (good for HDD)(compress almost all files expect some)(low compression faster R/W speed) 
 	# compress-force=zstd:15 (good for SSD)(compress all files forcefully)(high compression low R/W speed)
-	## if you are storing mp3,mp4,zip it's better to use low or no compression because files are already compressed
-	## you can use any number of compression b/w 1 to 15 
+	# if you are storing mp3,mp4,zip it's better to use low or no compression because files are already compressed
+	# you can use any number of compression b/w 1 to 15 
 	#
 	# discard=async,space_cache=v2, ==>>> if you dont add this option it will automatically be added in /etc/fstab
 	# autodefrag ===>> will automatically defrag your btrfs file system :)
 	# @var ===>> this subvolume is fixing timeshift snapshots not deleting error :)
+	##############################################################################################################
 	
 
 	# fixing timeshift snapshot not deleting error | will maybe break systemd-nspawn but docker is a good alternative
@@ -182,6 +175,32 @@ sleep 10s #check all correct above
 lsblk -p  ## -p => prints full device path
 sleep 5s
 
+echo "##########################################################################"
+echo "######################### fixing archlinux keyring #######################"
+echo "##########################################################################"
+
+
+pacman --noconfirm -Syyy archlinux-keyring reflector
+reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist
+
+# update your pacman keyring (if you have any issue try billow process one by one)
+# pacman -Syyy
+# pacman-key --init
+# pacman-key --populate
+# pacman-key --refresh-keys
+# pacman -S archlinux-keyring
+# pacman -S reflector
+# 	  mirror='sudo reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist'
+# 	  mirrora='sudo reflector --latest 30 --number 10 --sort age --save /etc/pacman.d/mirrorlist'
+# 	  mirrord='sudo reflector --latest 30 --number 10 --sort delay --save /etc/pacman.d/mirrorlist'
+# 	  mirrors='sudo reflector --latest 30 --number 10 --sort score --save /etc/pacman.d/mirrorlist'
+# 	  mirrorx='sudo reflector --age 6 --latest 20  --fastest 20 --threads 5 --sort rate --protocol https --save /etc/pacman.d/mirrorlist'
+# reboot your system if problem is not fixed
+
+
+echo "##########################################################################"
+echo "########################## installing base system ########################"
+echo "##########################################################################"
 
 ### what kernal do you want to use
 # what ever the linux kernal you are using here you also need to change it in linux-headers if you are using it
@@ -255,6 +274,7 @@ echo "##########################################################################
 
 # setup your timezone
 # file is already in your system you just need to link it with other location
+# time_zone="$(curl --fail https://ipapi.co/timezone)" ### time_zone variable will return your timezone automatically ### Added this from arch wiki https://wiki.archlinux.org/title/System_time
 
 ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime
 #					       <TAB> / <TAB>
@@ -288,8 +308,8 @@ echo "##########################################################################
 echo "########################### setting up your HOST #########################"
 echo "##########################################################################"
 
-echo "write HostName/NickName for the OS(tv): "
-read hostname
+#echo "write HostName/NickName for the OS(tv): "
+#read hostname
 echo $hostname > /etc/hostname
 
 echo "127.0.0.1       localhost" >> /etc/hosts
@@ -351,7 +371,7 @@ xorg-server
 xorg-apps
 xorg-xinit
 mesa
-intel-ucode
+intel-ucode  # amd-ucode (for AMD graphics)
 # xf86-video-intel ## not installing this pkg because its changing display name, giving error for other pkg (eg. vibrent-linux)
 
 grub
@@ -444,15 +464,6 @@ pacman -S --noconfirm --needed "${pkgs[@]}"
 #      bluez bluez-utils
 
 
-echo "##########################################################################"
-echo "###################### setting up root user password #####################"
-echo "##########################################################################"
-
-echo "set password for root user"
-passwd
-
-#username: root
-#password:
 
 echo "##########################################################################"
 echo "###################### setting up GRUB BOOTLOADER ########################"
@@ -499,17 +510,30 @@ mkinitcpio -P
 #btrfs crc32c-intel
 
 
+echo "##########################################################################"
+echo "###################### setting up root user password #####################"
+echo "##########################################################################"
+
+#echo "set password for root user"
+#passwd
+
+echo "root:$rootpass" | chpasswd
+
+#usernam: root
+#password:
 
 
 echo "##########################################################################"
 echo "########################## creating New USER ############################"
 echo "##########################################################################"
 
-echo "Enter Your Username : "
-read username
+#echo "Enter Your Username : "
+#read username
 
 useradd -m -g users -G audio,video,network,wheel,storage,rfkill -s /bin/bash $username
-passwd $username
+#passwd $username
+
+echo "$username:$userpass" | chpasswd
 
 
 ## adding user into wheel group ##
@@ -529,7 +553,7 @@ echo "##########################################################################
 echo "########################## starting some deamons #########################"
 echo "##########################################################################"
 
-systemctl enable NetworkManager
+systemctl enable NetworkManager     # don't put --now will give you error
 #systemctl enable bluetooth			(enable bluetooth)(IDK)
 #systemctl enable org.cups.cupsd		(enable printer)(IDK)
 
