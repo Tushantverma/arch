@@ -642,6 +642,7 @@ hypervisor=$(systemd-detect-virt)
         oracle )    echo "VirtualBox has been detected, setting up guest tools."
                     pacman --noconfirm -S virtualbox-guest-utils 
                     systemctl enable vboxservice.service
+                    usermod -aG vboxsf $username  # normal user read-write access on shared folder
                     ;;
         microsoft ) echo "Hyper-V has been detected, setting up guest tools."
                     #pacstrap /mnt hyperv &>/dev/null
