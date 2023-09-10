@@ -122,7 +122,7 @@ sleep 10s #check all correct above
 #	btrfs su cr /mnt/@root
 	btrfs su cr /mnt/@srv
 	btrfs su cr /mnt/@tmp
-	btrfs su cr /mnt/@.snapshots
+#	btrfs su cr /mnt/@.snapshots
 	btrfs su cr /mnt/@var_log
 	btrfs su cr /mnt/@var_pkg
 
@@ -132,14 +132,14 @@ sleep 10s #check all correct above
 
 	mountpoint="defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120"
 	mount -o "$mountpoint",subvol=@             $linuxpartition /mnt
-	mkdir -p /mnt/{home,srv,var/{log,cache/pacman/pkg},tmp,.snapshots} #/mnt/root
+	mkdir -p /mnt/{home,root,srv,var/{log,cache/pacman/pkg},tmp,.snapshots}
 
 	# I'm setting options manually otherwise it will set some options automatically (this will reflect in /etc/fstab)
 	mount -o "$mountpoint",subvol=@home         $linuxpartition /mnt/home
 #	mount -o "$mountpoint",subvol=@root         $linuxpartition /mnt/root
 	mount -o "$mountpoint",subvol=@srv          $linuxpartition /mnt/srv
 	mount -o "$mountpoint",subvol=@tmp          $linuxpartition /mnt/tmp
-	mount -o "$mountpoint",subvol=@.snapshots   $linuxpartition /mnt/.snapshots
+#	mount -o "$mountpoint",subvol=@.snapshots   $linuxpartition /mnt/.snapshots
 
 	# fixing. pkg rollback fully & properly after snapshot restore ## now you can reinstall same package after restoring the snapshot #timeshift fixed
 	mount -o "$mountpoint",subvol=@var_log      $linuxpartition /mnt/var/log
@@ -669,7 +669,7 @@ echo "##########################################################################
 #part33
 
 su - $username -c "chezmoi init --apply https://github.com/tushantverma/dotfiles"
-./home/$username/.myscripts/1_setup_all.sh
+./home/$username/.bin/1_setup_all.sh
 
 
 
