@@ -1,7 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-#setfont ter-128n   #### changing the font size "ter" is a font name and "128n" is the font size
+#setfont ter-128n   #### changing the font size "ter" is a font name and "128n" or "v28n" is the font size example
 #screen -h 99999    #### for scrollback on tty while installing OS (99999 is the schrollback buffer) (it's tmux alternative ) eanble scrolling "ctrl + a ["     disable scrolling "esc"
+#bash <(curl -L https://raw.githubusercontent.com/Tushantverma/arch/main/testing-install.sh)    ## you can run the script this way without git clone
 
 #part11
 echo "##########################################################################"
@@ -65,12 +66,12 @@ echo "##########################################################################
 echo "##### assigning all variables at once to export into arch-chroot #########"
 echo "##########################################################################"
 
-read -p "write HostName/NickName for the OS(tv): " hostname && export hostname
+read -ep "write HostName/NickName for the OS(tv): " hostname && export hostname
 
-read -p "Enter Your UserName : "                   username && export username
-read -p "Enter Your UserPass : "                   userpass && export userpass
+read -ep "Enter Your UserName : "                   username && export username
+read -ep "Enter Your UserPass : "                   userpass && export userpass
 
-read -p "Enter Your RootPass : "                   rootpass && export rootpass
+read -ep "Enter Your RootPass : "                   rootpass && export rootpass
 
 
 
@@ -97,6 +98,7 @@ lsblk -p  ## -p => prints full device path
 # wipefs -t ext4 /dev/sda  ###(to wipe only specific file signature only not all file signature) faster method (never tried)
 # dd if=/dev/zero of=/dev/sda bs=1M  ###(to complete wipe full file system or full partition by adding random data 1 time)
 # shred -vfz /dev/sda ###(to complete wipe full file system or full partition by adding random data 4 time) (most secure way. time taking) not good for ssd life
+# shred -n 1 -vfz /dev/sda ### (-n 1 means format 1 time. by default its 4 time , -v = verbose , -f = force , -z = fill with zero and -s <num> = fill with any number not just zero , -u file.txt , -r -u my_directory to delete all files in a directory recursively
 
 echo "Enter the BOOT partition (/dev/sdaX) : "
 read bootpartition
@@ -233,12 +235,12 @@ sleep 5s
 sed "1,/^#part22$/d" ${0} > /mnt/install2.sh 
 chmod +x /mnt/install2.sh
 arch-chroot /mnt ./install2.sh
+rm -rf /mnt/install2.sh
 
 # after running the #part2 unmount /mnt and reboot
 echo "unmount /mnt && exit script && removeing /mnt/install2.sh in 10 second"
 echo "you can use ## 'arch-chroot /mnt'  now "
 sleep 10s
-rm -rf /mnt/install2.sh
 umount -R /mnt
 
 echo "installaion DONE you can reboot now"
@@ -438,6 +440,13 @@ sweet-cursor-theme-git
 sweet-gtk-theme-dark
 xcursor-breeze
 arc-blackest-theme-git
+
+#### for zsh ####
+zsh
+zsh-fast-syntax-highlighting
+# zsh-autosuggestions
+# zsh-syntax-highlighting
+
 
 # linux-headers-lts
 # linux-lts
@@ -671,6 +680,8 @@ echo "##########################################################################
 su - $username -c "chezmoi init --apply https://github.com/tushantverma/dotfiles"
 ./home/$username/.bin/1_setup_all.sh
 
+###### changing default shell for the user ########
+chsh -s $(which zsh) $username  # -s means --shell
 
 
 
