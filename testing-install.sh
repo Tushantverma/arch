@@ -238,7 +238,7 @@ arch-chroot /mnt ./install2.sh
 rm -rf /mnt/install2.sh
 
 # after running the #part2 unmount /mnt and reboot
-echo "unmount /mnt && exit script && removeing /mnt/install2.sh in 10 second"
+echo "unmount /mnt && exit script in 10 second"
 echo "you can use ## 'arch-chroot /mnt'  now "
 sleep 10s
 umount -R /mnt
@@ -533,17 +533,24 @@ echo "root:$rootpass" | chpasswd
 
 
 echo "##########################################################################"
-echo "########################## creating New USER ############################"
+echo "################## creating New USER with Default shell ##################"
 echo "##########################################################################"
 
 #echo "Enter Your Username : "
 #read username
 
-useradd -m -g users -G audio,video,network,wheel,storage,rfkill -s /bin/bash $username
+##### cleaning up Default bash bloat (prevent useless files to copy form /etc/skel to home directory on new user creation) #####
+rm -rf /etc/skel/.bash*  ## this files are not required even if you are using your default shell as bash
+
+useradd -m -g users -G audio,video,network,wheel,storage,rfkill -s $(which zsh) $username   
+# -s means --shell , -m means create home directory for the user
+
 #passwd $username
 
 echo "$username:$userpass" | chpasswd
 
+###### changing default shell for the USER you can use this method or above line of code ########
+# chsh -s $(which zsh) $username  
 
 ## adding user into wheel group ##
 #echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers  (other option)
@@ -554,7 +561,6 @@ sed -i "s/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/" /etc/sudoers
 #### or ####
 #EDITOR=nvim visudo    #### and you should not use "#EDITOR=neovim visudo"
 #	%wheel ALL=(ALL:ALL) ALL    (uncomment this line)(ALL)
-
 
 
 
@@ -680,8 +686,6 @@ echo "##########################################################################
 su - $username -c "chezmoi init --apply https://github.com/tushantverma/dotfiles"
 ./home/$username/.bin/1_setup_all.sh
 
-###### changing default shell for the user ########
-chsh -s $(which zsh) $username  # -s means --shell
 
 
 
