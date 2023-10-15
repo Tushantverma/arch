@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
-#setfont ter-128n   #### changing the font size "ter" is a font name and "128n" or "v28n" is the font size example
-#screen -h 99999    #### for scrollback on tty while installing OS (99999 is the schrollback buffer) (it's tmux alternative ) eanble scrolling "ctrl + a ["     disable scrolling "esc"
-#bash <(curl -L https://raw.githubusercontent.com/Tushantverma/arch/main/testing-install.sh)    ## you can run the script this way without git clone
+# setfont ter-128n   #### changing the font size "ter" is a font name and "128n" or "v28n" is the font size example
+# screen -h 99999    #### for scrollback on tty while installing OS (99999 is the schrollback buffer) (it's tmux alternative ) eanble scrolling "ctrl + a ["     disable scrolling "esc"
+
+# bash <(curl -L https://raw.githubusercontent.com/Tushantverma/arch/main/testing-install.sh)          ## you can run the script this way without git clone  (my script is not designed to use this... #not working)
+# curl -o install.sh -L https://raw.githubusercontent.com/Tushantverma/arch/main/testing-install.sh    ## you can get the script this way without git clone
+
 
 #part11
 echo "##########################################################################"
@@ -410,6 +413,7 @@ feh
 xfce4-terminal
 sxhkd
 rofi
+repgrep # better replacement of "ripgrep"
 
 ### fonts ###
 ttf-iosevka-nerd
@@ -443,9 +447,8 @@ arc-blackest-theme-git
 
 #### for zsh ####
 zsh
-zsh-fast-syntax-highlighting
+zsh-fast-syntax-highlighting  # better replacement of "zsh-syntax-highlighting"
 # zsh-autosuggestions
-# zsh-syntax-highlighting
 
 
 # linux-headers-lts
@@ -543,14 +546,14 @@ echo "##########################################################################
 rm -rf /etc/skel/.bash*  ## this files are not required even if you are using your default shell as bash
 
 useradd -m -g users -G audio,video,network,wheel,storage,rfkill -s $(which zsh) $username   
-# -s means --shell , -m means create home directory for the user
+# -s means --shell , -m means create home directory for the user with same username
 
 #passwd $username
 
 echo "$username:$userpass" | chpasswd
 
 ###### changing default shell for the USER you can use this method or above line of code ########
-# chsh -s $(which zsh) $username  
+# chsh -s $(which zsh) $username   ## -s means --shell
 
 ## adding user into wheel group ##
 #echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers  (other option)
