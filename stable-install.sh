@@ -1,7 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-#setfont ter-128n   #### changing the font size "ter" is a font name and "128n" is the font size
-#screen -h 99999    #### for scrollback on tty while installing OS (99999 is the schrollback buffer) (it's tmux alternative ) eanble scrolling "ctrl + a ["     disable scrolling "esc"
+# setfont ter-128n   #### changing the font size "ter" is a font name and "128n" or "v28n" is the font size example
+# screen -h 99999    #### for scrollback on tty while installing OS (99999 is the schrollback buffer) (it's tmux alternative ) eanble scrolling "ctrl + a ["     disable scrolling "esc"
+
+# bash <(curl -L https://raw.githubusercontent.com/Tushantverma/arch/main/testing-install.sh)          ## you can run the script this way without git clone  (my script is not designed to use this... #not working)
+# curl -o install.sh -L https://raw.githubusercontent.com/Tushantverma/arch/main/testing-install.sh    ## you can get the script this way without git clone
+
 
 #part11
 echo "##########################################################################"
@@ -65,12 +69,12 @@ echo "##########################################################################
 echo "##### assigning all variables at once to export into arch-chroot #########"
 echo "##########################################################################"
 
-read -p "write HostName/NickName for the OS(tv): " hostname && export hostname
+read -ep "write HostName/NickName for the OS(tv): " hostname && export hostname
 
-read -p "Enter Your UserName : "                   username && export username
-read -p "Enter Your UserPass : "                   userpass && export userpass
+read -ep "Enter Your UserName : "                   username && export username
+read -ep "Enter Your UserPass : "                   userpass && export userpass
 
-read -p "Enter Your RootPass : "                   rootpass && export rootpass
+read -ep "Enter Your RootPass : "                   rootpass && export rootpass
 
 
 
@@ -97,6 +101,7 @@ lsblk -p  ## -p => prints full device path
 # wipefs -t ext4 /dev/sda  ###(to wipe only specific file signature only not all file signature) faster method (never tried)
 # dd if=/dev/zero of=/dev/sda bs=1M  ###(to complete wipe full file system or full partition by adding random data 1 time)
 # shred -vfz /dev/sda ###(to complete wipe full file system or full partition by adding random data 4 time) (most secure way. time taking) not good for ssd life
+# shred -n 1 -vfz /dev/sda ### (-n 1 means format 1 time. by default its 4 time , -v = verbose , -f = force , -z = fill with zero and -s <num> = fill with any number not just zero , -u file.txt , -r -u my_directory to delete all files in a directory recursively
 
 echo "Enter the BOOT partition (/dev/sdaX) : "
 read bootpartition
@@ -122,7 +127,7 @@ sleep 10s #check all correct above
 #	btrfs su cr /mnt/@root
 	btrfs su cr /mnt/@srv
 	btrfs su cr /mnt/@tmp
-	btrfs su cr /mnt/@.snapshots
+#	btrfs su cr /mnt/@.snapshots
 	btrfs su cr /mnt/@var_log
 	btrfs su cr /mnt/@var_pkg
 
@@ -132,14 +137,14 @@ sleep 10s #check all correct above
 
 	mountpoint="defaults,noatime,compress=zstd,discard=async,space_cache=v2,autodefrag,commit=120"
 	mount -o "$mountpoint",subvol=@             $linuxpartition /mnt
-	mkdir -p /mnt/{home,srv,var/{log,cache/pacman/pkg},tmp,.snapshots} #/mnt/root
+	mkdir -p /mnt/{home,root,srv,var/{log,cache/pacman/pkg},tmp,.snapshots}
 
 	# I'm setting options manually otherwise it will set some options automatically (this will reflect in /etc/fstab)
 	mount -o "$mountpoint",subvol=@home         $linuxpartition /mnt/home
 #	mount -o "$mountpoint",subvol=@root         $linuxpartition /mnt/root
 	mount -o "$mountpoint",subvol=@srv          $linuxpartition /mnt/srv
 	mount -o "$mountpoint",subvol=@tmp          $linuxpartition /mnt/tmp
-	mount -o "$mountpoint",subvol=@.snapshots   $linuxpartition /mnt/.snapshots
+#	mount -o "$mountpoint",subvol=@.snapshots   $linuxpartition /mnt/.snapshots
 
 	# fixing. pkg rollback fully & properly after snapshot restore ## now you can reinstall same package after restoring the snapshot #timeshift fixed
 	mount -o "$mountpoint",subvol=@var_log      $linuxpartition /mnt/var/log
@@ -233,12 +238,12 @@ sleep 5s
 sed "1,/^#part22$/d" ${0} > /mnt/install2.sh 
 chmod +x /mnt/install2.sh
 arch-chroot /mnt ./install2.sh
+rm -rf /mnt/install2.sh
 
 # after running the #part2 unmount /mnt and reboot
-echo "unmount /mnt && exit script && removeing /mnt/install2.sh in 10 second"
+echo "unmount /mnt && exit script in 10 second"
 echo "you can use ## 'arch-chroot /mnt'  now "
 sleep 10s
-rm -rf /mnt/install2.sh
 umount -R /mnt
 
 echo "installaion DONE you can reboot now"
@@ -408,6 +413,7 @@ feh
 xfce4-terminal
 sxhkd
 rofi
+repgrep # better replacement of "ripgrep"
 
 ### fonts ###
 ttf-iosevka-nerd
@@ -438,6 +444,12 @@ sweet-cursor-theme-git
 sweet-gtk-theme-dark
 xcursor-breeze
 arc-blackest-theme-git
+
+#### for zsh ####
+zsh
+zsh-fast-syntax-highlighting  # better replacement of "zsh-syntax-highlighting"
+# zsh-autosuggestions
+
 
 # linux-headers-lts
 # linux-lts
@@ -524,17 +536,24 @@ echo "root:$rootpass" | chpasswd
 
 
 echo "##########################################################################"
-echo "########################## creating New USER ############################"
+echo "################## creating New USER with Default shell ##################"
 echo "##########################################################################"
 
 #echo "Enter Your Username : "
 #read username
 
-useradd -m -g users -G audio,video,network,wheel,storage,rfkill -s /bin/bash $username
+##### cleaning up Default bash bloat (prevent useless files to copy form /etc/skel to home directory on new user creation) #####
+rm -rf /etc/skel/.bash*  ## this files are not required even if you are using your default shell as bash
+
+useradd -m -g users -G audio,video,network,wheel,storage,rfkill -s $(which zsh) $username   
+# -s means --shell , -m means create home directory for the newuser with the same name as username
+
 #passwd $username
 
 echo "$username:$userpass" | chpasswd
 
+###### changing default shell for the USER you can use this method or above line of code ########
+# chsh -s $(which zsh) $username   ## -s means --shell
 
 ## adding user into wheel group ##
 #echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers  (other option)
@@ -545,7 +564,6 @@ sed -i "s/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/" /etc/sudoers
 #### or ####
 #EDITOR=nvim visudo    #### and you should not use "#EDITOR=neovim visudo"
 #	%wheel ALL=(ALL:ALL) ALL    (uncomment this line)(ALL)
-
 
 
 
@@ -642,6 +660,7 @@ hypervisor=$(systemd-detect-virt)
         oracle )    echo "VirtualBox has been detected, setting up guest tools."
                     pacman --noconfirm -S virtualbox-guest-utils 
                     systemctl enable vboxservice.service
+                    usermod -aG vboxsf $username  # normal user read-write access on shared folder
                     ;;
         microsoft ) echo "Hyper-V has been detected, setting up guest tools."
                     #pacstrap /mnt hyperv &>/dev/null
@@ -668,7 +687,7 @@ echo "##########################################################################
 #part33
 
 su - $username -c "chezmoi init --apply https://github.com/tushantverma/dotfiles"
-./home/$username/.myscripts/1_setup_all.sh
+./home/$username/.bin/1_setup_all.sh
 
 
 

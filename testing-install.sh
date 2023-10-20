@@ -546,7 +546,7 @@ echo "##########################################################################
 rm -rf /etc/skel/.bash*  ## this files are not required even if you are using your default shell as bash
 
 useradd -m -g users -G audio,video,network,wheel,storage,rfkill -s $(which zsh) $username   
-# -s means --shell , -m means create home directory for the user with same username
+# -s means --shell , -m means create home directory for the newuser with the same name as username
 
 #passwd $username
 
