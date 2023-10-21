@@ -69,12 +69,12 @@ echo "##########################################################################
 echo "##### assigning all variables at once to export into arch-chroot #########"
 echo "##########################################################################"
 
-read -ep "write HostName/NickName for the OS(tv): " hostname && export hostname
+read -ep "$(tput setaf 2)Enter your HostName(tv) : $(tput sgr0)"               hostname && export hostname
 
-read -ep "Enter Your UserName : "                   username && export username
-read -ep "Enter Your UserPass : "                   userpass && export userpass
+read -ep "$(tput setaf 2)Enter Your UserName : $(tput sgr0)"                   username && export username
+read -ep "$(tput setaf 2)Enter Your UserPass : $(tput sgr0)"                   userpass && export userpass
 
-read -ep "Enter Your RootPass : "                   rootpass && export rootpass
+read -ep "$(tput setaf 2)Enter Your RootPass : $(tput sgr0)"                   rootpass && export rootpass
 
 
 
@@ -89,11 +89,10 @@ echo "#################################"
 echo "##### THIS IS BTRFS INSTALL #####"
 echo "##### YOU DON'T NEED TO DELETE AND RECREATE PARTITION IF IT'S ALREADY THERE JUST ENTER IN CFDISK CHECK EVERYTHING THEN QUIT #####"
 
-echo "Enter the drive (/dev/sda) : "
-read drive
+read -ep "$(tput setaf 2)Enter the drive (e.g. /dev/sda) : $(tput sgr0)"  drive 
 cfdisk $drive 
 
-sleep 5s
+sleep 2s
 lsblk -p  ## -p => prints full device path
 
 ######## how to wipe your file signature/ complete wipe your disk or partition ############
@@ -103,19 +102,16 @@ lsblk -p  ## -p => prints full device path
 # shred -vfz /dev/sda ###(to complete wipe full file system or full partition by adding random data 4 time) (most secure way. time taking) not good for ssd life
 # shred -n 1 -vfz /dev/sda ### (-n 1 means format 1 time. by default its 4 time , -v = verbose , -f = force , -z = fill with zero and -s <num> = fill with any number not just zero , -u file.txt , -r -u my_directory to delete all files in a directory recursively
 
-echo "Enter the BOOT partition (/dev/sdaX) : "
-read bootpartition
+read -ep "$(tput setaf 2)Enter the BOOT partition (e.g. /dev/sdaX) : $(tput sgr0)"  bootpartition 
 wipefs -af $bootpartition  # wipe boot file signature forcefully
 mkfs.vfat -F32 $bootpartition 
 
-echo "Enter the SWAP partition (/dev/sdaX) : "
-read swappartition
+read -ep "$(tput setaf 2)Enter the SWAP partition (e.g. /dev/sdaX) : $(tput sgr0)"  swappartition 
 wipefs -af $swappartition # wipe swap file signature forcefully
 mkswap $swappartition -f    ###-f = forcefully if any error there
 swapon $swappartition
 
-echo "Enter the LINUX partition (/dev/sdaX) : "
-read linuxpartition
+read -ep "$(tput setaf 2)Enter the LINUX partition (e.g. /dev/sdaX) : $(tput sgr0)"  linuxpartition 
 wipefs -af $linuxpartition  # wipe linux file signature forcefully 
 mkfs.btrfs $linuxpartition -f   ###-f = forcefully if any error there
 
