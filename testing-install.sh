@@ -85,9 +85,14 @@ echo "##########################################################################
 lsblk -p  ## -p => prints full device path
 # $fdisk -l (alternetive shows full drive name with /dev/sdaX) 
 
-echo "#################################"
-echo "##### THIS IS BTRFS INSTALL #####"
-echo "##### YOU DON'T NEED TO DELETE AND RECREATE PARTITION IF IT'S ALREADY THERE JUST ENTER IN CFDISK CHECK EVERYTHING THEN QUIT #####"
+tput setaf 3 # Yellow Color
+echo "##########################################################################################"
+echo "#                                THIS IS A BTRFS INSTALL                                 #"
+echo "# YOU DON'T NEED TO DELETE AND RE-CREATE SAME PARTITIONS TO FORMAT IF IT'S ALREADY THERE #"
+echo "#          THE SCRIPT WILL DELETE THE SELECTED PARTITION (NOT DRIVE) AUTOMATICALLY       #"
+echo "#                JUST ENTER IN CFDISK CHECK EVERYTHING GOOD THEN QUIT                    #"
+echo "##########################################################################################"
+tput sgr0  # Reset Color
 
 read -ep "$(tput setaf 2)Enter the drive (e.g. /dev/sda) : $(tput sgr0)"  drive 
 cfdisk $drive 
@@ -182,14 +187,31 @@ echo "##########################################################################
 
 
 pacman --noconfirm -Syyy archlinux-keyring reflector
-reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist
 
-# update your pacman keyring (if you have any issue try billow process one by one)
+iso=$(curl -4 ifconfig.co/country-iso)
+reflector -a 48 -c $iso -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
+# reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist  # old way
+# you can try : https://wiki.archlinux.org/title/mirrors
+
+# ---------------------update your pacman keyring------------------------#
+
+# after booting into Arch Live ISO Wait for 1 minute (don't run any command). it will use your internet to automatic sync/configure some files for your machine otherwise you may face keyring issue
+
+# archlinux-keyring-wkd-sync (--or--) /usr/bin/archlinux-keyring-wkd-sync   # (it refresh the priviously imported keyring)
+# if this above command is not working only then try billow commands
+
 # pacman -Syyy
-# pacman-key --init
+# pacman-key --init               <<<<<<<<<<<<----------------------------  # (it first deletes the priviously imported keyring and then assign new keyring)
 # pacman-key --populate
 # pacman-key --refresh-keys
-# pacman -S archlinux-keyring
+
+# timedatectl set-ntp true #(default is true already)
+# timedatectl set-timezone Asia/Kolkata
+
+# pacman -S archlinux-keyring     # if this failed by (invalid or corrupted package (PGP signature)) then
+#	pacman -Sc ; pacman -Scc
+#	rm -rf /etc/pacman.d/gnupg/*  # and run every above command again
+
 # pacman -S reflector
 # 	  mirror='sudo reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist'
 # 	  mirrora='sudo reflector --latest 30 --number 10 --sort age --save /etc/pacman.d/mirrorlist'
@@ -198,6 +220,7 @@ reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist
 # 	  mirrorx='sudo reflector --age 6 --latest 20  --fastest 20 --threads 5 --sort rate --protocol https --save /etc/pacman.d/mirrorlist'
 # reboot your system if problem is not fixed
 
+# for more details : https://wiki.archlinux.org/title/Pacman/Package_signing
 
 echo "##########################################################################"
 echo "########################## installing base system ########################"
