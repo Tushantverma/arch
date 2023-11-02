@@ -458,11 +458,13 @@ catfish
 #### themes ####
 lxappearance
 qt5ct
-a-candy-beauty-icon-theme-git
-sweet-cursor-theme-git
-sweet-gtk-theme-dark
+# a-candy-beauty-icon-theme-git
+# sweet-cursor-theme-git
+# sweet-gtk-theme-dark
 xcursor-breeze
 arc-blackest-theme-git
+surfn-icons-git
+# epapirus-icon-theme
 
 #### for zsh ####
 zsh
@@ -595,6 +597,11 @@ systemctl enable NetworkManager     # don't put --now will give you error
 #systemctl enable org.cups.cupsd		(enable printer)(IDK)
 
 
+echo "##########################################################################"
+echo "################### setting up default mouse cursor ######################"
+echo "##########################################################################"
+
+sed -i "s/Inherits=.*/Inherits=Breeze_Snow/" /usr/share/icons/default/index.theme
 
 
 echo "##########################################################################"
