@@ -233,7 +233,7 @@ echo "##########################################################################
 # linux-lts
 # linux-zen
 
-pacstrap /mnt base base-devel linux-zen linux-firmware neovim btrfs-progs
+pacstrap /mnt base base-devel linux-lts linux-firmware neovim btrfs-progs
    
 genfstab -U -p /mnt >> /mnt/etc/fstab
 # The -p flag include all the partitions including those that are not currently mounted... -U flags tells use UUID in fstab
@@ -363,9 +363,6 @@ echo "Include = /etc/pacman.d/mirrorlist"   >> /etc/pacman.conf
 pacman -Syyy
 
 
-# reflector now needed after install it will get mirrorlist form live install to main system
-# check mkinitcpio.conf how to sed and add btrfs module
-
 
 
 
@@ -453,7 +450,9 @@ wireless_tools
 file-roller
 yt-dlp
 meld
-catfish
+reflector
+unclutter # hide cursor after some time
+# catfish
 
 #### themes ####
 lxappearance
@@ -471,11 +470,11 @@ zsh
 zsh-fast-syntax-highlighting  # better replacement of "zsh-syntax-highlighting"
 # zsh-autosuggestions
 
+#### user app ####
+firefox
+obsidian
+flameshot
 
-# linux-headers-lts
-# linux-lts
-# dialogs
-# reflector
 
 )
 
