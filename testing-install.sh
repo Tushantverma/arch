@@ -596,12 +596,6 @@ systemctl enable NetworkManager     # don't put --now will give you error
 #systemctl enable org.cups.cupsd		(enable printer)(IDK)
 
 
-echo "##########################################################################"
-echo "################### setting up default mouse cursor ######################"
-echo "##########################################################################"
-
-sed -i "s/Inherits=.*/Inherits=Breeze_Snow/" /usr/share/icons/default/index.theme
-
 
 echo "##########################################################################"
 echo "############### setting up auto temporary file cleanup ###################"
