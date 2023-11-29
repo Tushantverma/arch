@@ -709,6 +709,12 @@ su - $username -c "chezmoi init --apply https://github.com/tushantverma/dotfiles
 ./home/$username/.bin/1_setup_all.sh
 
 
+echo "##########################################################################"
+echo "####################### mute the mic (not speaker) #######################"
+echo "##########################################################################"
+
+amixer --quiet set Capture nocap # mute
+# amixer --quiet set Capture cap  # un-mute
 
 
 
