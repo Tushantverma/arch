@@ -447,7 +447,7 @@ light
 alsa-utils
 net-tools
 wireless_tools
-file-roller
+engrampa # "file-roller" have more option but it's theming is odd (second best option would be "xarchiver")
 yt-dlp
 meld
 reflector
