@@ -33,10 +33,22 @@ echo "##########################################################################
 
 
 echo "##########################################################################"
-echo "######################### parallel download ##############################"
+echo "############### setting up /etc/pacman.conf (for live ISO) ###############"
 echo "##########################################################################"
 
-sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 15/" /etc/pacman.conf
+
+setup_pacman_conf() {
+
+	sed -i 's/#Color/Color/'                                                     /etc/pacman.conf   # enable color for pacman
+	sed -i 's/#VerbosePkgLists/VerbosePkgLists/'                                 /etc/pacman.conf   # show difference b/w old and new packages version
+	sed -i 's/^#ParallelDownloads = 5$/ParallelDownloads = 15/'                  /etc/pacman.conf   # enable parallel downloads
+	sed -i '/^ParallelDownloads = [0-9]\+$/a ILoveCandy\nDisableDownloadTimeout' /etc/pacman.conf   # added ILoveCandy and (DisableDownloadTimeout for slow internet) after Parallel Downloads line
+	sed -i '/\[multilib\]/,/Include/''s/^#//'                                    /etc/pacman.conf   # uncomment multilib repo
+	# source https://github.com/arcolinux/arcolinuxl-iso/blob/master/archiso/pacman.conf
+
+}
+
+setup_pacman_conf && export -f setup_pacman_conf # execute the function and export it for chroot / main system
 
 
 echo "##########################################################################"
@@ -233,7 +245,7 @@ echo "##########################################################################
 # linux-lts
 # linux-zen
 
-pacstrap /mnt base base-devel linux-lts linux-firmware neovim btrfs-progs
+pacstrap /mnt base base-devel linux-lts linux-firmware neovim btrfs-progs sed
    
 genfstab -U -p /mnt >> /mnt/etc/fstab
 # The -p flag include all the partitions including those that are not currently mounted... -U flags tells use UUID in fstab
@@ -342,24 +354,11 @@ echo "127.0.1.1       $hostname.localdomain $hostname" >> /etc/hosts
 
 
 echo "##########################################################################"
-echo "################## setting up Parallel Downloads in chroot ###############"
+echo "########### setting up /etc/pacman.conf (for Main System) ################"
 echo "##########################################################################"
 
-pacman -Syyy --noconfirm sed
-sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 15/" /etc/pacman.conf
+setup_pacman_conf # executing exported function to setup pacman.conf for main system
 
-
-
-
-echo "##########################################################################"
-echo "#############################(( others ))#################################"
-echo "##########################################################################"
-
-# uncomment multilib in /etc/pacman.conf     [multilib] with sed try
-
-echo " "                                    >> /etc/pacman.conf
-echo "[multilib]"                           >> /etc/pacman.conf
-echo "Include = /etc/pacman.d/mirrorlist"   >> /etc/pacman.conf
 pacman -Syyy
 
 
