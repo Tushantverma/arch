@@ -4,6 +4,14 @@
 [ "$EUID" -ne 0 ] && echo "This script requires root privileges." && exec sudo sh "$0" "$@"; 
 
 
+################### if file system is already mounted then umount it #########################
+if mountpoint -q "/mnt"; then
+  umount -lf "/mnt" && echo "Successfully unmounted the filesystem." || (echo "Failed to unmount the filesystem. Exiting." && exit 1)
+else
+  echo "File system is not mounted already."
+fi
+
+
 lsblk -p  ## -p => prints full device path
 read -rep "$(tput setaf 2)Enter the LINUX partition (e.g. /dev/sdaX) : $(tput sgr0)"  linuxpartition 
 
@@ -29,9 +37,10 @@ read -rep "$(tput setaf 2)Enter the LINUX partition (e.g. /dev/sdaX) : $(tput sg
 ################################################################################################
 
 
+echo "###################################################################################"
+echo "############ chrooting into system #### su <username> to switch user ##############"
+echo "#### you can access your system files at /mnt now.. without arch-chroot as well ###"
+echo "###################################################################################"
 
 arch-chroot /mnt
 
-echo "##########################################################################"
-echo "######## chrooted into system #### su <username> to switch user###########"
-echo "##########################################################################"
