@@ -5,11 +5,18 @@
 
 
 ################### if file system is already mounted then umount it #########################
+unmount_filesystem() {
+
 if mountpoint -q "/mnt"; then
-  umount -lf "/mnt" && echo "Successfully unmounted the filesystem." || (echo "Failed to unmount the filesystem. Exiting." && exit 1)
+   umount -lf "/mnt" && echo "$(tput setaf 3)Successfully unmounted the filesystem.$(tput sgr0)" || (echo "$(tput setaf 1)Failed to unmount the filesystem. Exiting.$(tput sgr0)" && exit 1)
 else
-  echo "File system is not mounted already."
+   echo "$(tput setaf 2)File system is not mounted already.$(tput sgr0)"
 fi
+
+}
+unmount_filesystem  # Call the function
+##############################################################################################
+
 
 
 lsblk -p  ## -p => prints full device path
@@ -43,4 +50,6 @@ echo "#### you can access your system files at /mnt now.. without arch-chroot as
 echo "###################################################################################"
 
 arch-chroot /mnt
+
+unmount_filesystem  # Call the function
 
