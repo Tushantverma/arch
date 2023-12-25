@@ -448,8 +448,9 @@ repgrep # better replacement of "ripgrep"
 
 ### fonts ###
 ttf-iosevka-nerd
-ttf-indic-otf
+ttf-indic-otf # hindi fonts
 noto-fonts
+noto-fonts-emoji 
 
 polkit-gnome
 man-db
