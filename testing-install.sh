@@ -424,7 +424,7 @@ mtools	      # required by gparted
 
 bat
 htop
-neofetch
+fastfetch
 sublime-text-4
 yay
 thunar
