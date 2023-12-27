@@ -444,7 +444,7 @@ feh
 xfce4-terminal
 sxhkd
 rofi
-repgrep # better replacement of "ripgrep"
+repgrep # better replacement of "ripgrep" ## GUI alternative is "catfish"
 
 ### fonts ###
 ttf-iosevka-nerd
@@ -458,18 +458,24 @@ fzf
 xclip
 chezmoi
 tree
-tldr
+
+plocate # locate command # update database with "$sudo updatedb" command
+tldr    # -------------- # update database/cache with "$tldr --update/-u" command
+
 light
 alsa-utils
 net-tools
 wireless_tools
+
+# file extractor
 engrampa # "file-roller" have more option but it's theming is odd (second best option would be "xarchiver")
+unrar
+
 yt-dlp
 meld
 reflector
 unclutter # hide cursor after some time
 xdotool   # for autotype
-# catfish
 
 #### themes ####
 lxappearance
@@ -647,6 +653,29 @@ Section "InputClass"
     Option "NaturalScrolling" "on"
     Option "DisableWhileTyping" "true"
 EndSection ' > /etc/X11/xorg.conf.d/30-touchpad.conf
+
+
+
+echo "##########################################################################"
+echo "################# setting up keyboard configuration ######################"
+echo "##########################################################################"
+
+echo '
+Section "InputClass"
+        Identifier "system-keyboard"
+        MatchIsKeyboard "on"
+        Option "XkbLayout" "us"
+        Option "AutoRepeat" "220 20"                       # fast keys (220sleepDelay 20repeat if lower number means fast and higher number means slow)
+        Option "XkbOptions" "caps:escape_shifted_capslock" # capslock ==> esc ## shift+capslock ==> capslock ##
+EndSection ' > /etc/X11/xorg.conf.d/00-keyboard.conf
+
+# fast keys will not brack automatically (like when it's used to in xinitrc)
+# capslock functionality will stay persistent ever after replugin keyboard on running xsession (DE/WM) (like problem existed when configured in xinitrc)
+
+## source
+# https://wiki.archlinux.org/title/Xorg/Keyboard_configuration#Using_X_configuration_files (for capslock)
+# https://wiki.archlinux.org/title/Xorg/Keyboard_configuration#Adjusting_typematic_delay_and_rate (for fast keys)
+# for more look at 'capslock' notes ; and 'xinitrc'
 
 
 
