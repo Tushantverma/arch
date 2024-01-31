@@ -476,6 +476,7 @@ meld
 reflector
 unclutter # hide cursor after some time
 xdotool   # for autotype
+keyd      # remaping keys for keyboard
 
 #### themes ####
 lxappearance
@@ -657,7 +658,7 @@ EndSection ' > /etc/X11/xorg.conf.d/30-touchpad.conf
 
 
 echo "##########################################################################"
-echo "################# setting up keyboard configuration ######################"
+echo "############# setting up keyboard configuration by X11 ###################"
 echo "##########################################################################"
 
 echo '
@@ -665,8 +666,8 @@ Section "InputClass"
         Identifier "system-keyboard"
         MatchIsKeyboard "on"
         Option "XkbLayout" "us"
-        Option "AutoRepeat" "220 20"                       # fast keys (220sleepDelay 20repeat if lower number means fast and higher number means slow)
-        Option "XkbOptions" "caps:escape_shifted_capslock" # capslock ==> esc ## shift+capslock ==> capslock ##
+        Option "AutoRepeat" "220 20"                           # fast keys (220sleepDelay 20repeat if lower number means fast and higher number means slow)
+        # Option "XkbOptions" "caps:escape_shifted_capslock"   # capslock ==> esc ## shift+capslock ==> capslock ##     ### this functionality is now handled by "keyd" package
 EndSection ' > /etc/X11/xorg.conf.d/00-keyboard.conf
 
 # fast keys will not brack automatically (like when it's used to in xinitrc)
@@ -676,6 +677,62 @@ EndSection ' > /etc/X11/xorg.conf.d/00-keyboard.conf
 # https://wiki.archlinux.org/title/Xorg/Keyboard_configuration#Using_X_configuration_files (for capslock)
 # https://wiki.archlinux.org/title/Xorg/Keyboard_configuration#Adjusting_typematic_delay_and_rate (for fast keys)
 # for more look at 'capslock' notes ; and 'xinitrc'
+
+
+echo "##########################################################################"
+echo "############# setting up keyboard configuration by keyd ##################"
+echo "##########################################################################"
+
+
+echo '
+
+[ids]
+*
+
+[main]
+compose = overload(meta, compose)
+capslock = overload(mylayer1, esc)
+backslash = overload(mylayer2, backslash)
+
+[mylayer1]
+h = left
+j = down
+k = up
+l = right
+n = home
+m = end
+u = C-z
+b = C-left
+. = C-right
+i = C-backspace
+p = C-delete
+o = S-enter
+y = backspace
+d = macro(home home S-end S-end delete delete)
+
+[mylayer2]
+q = leftbrace
+w = S-leftbrace
+e = S-backslash
+r = S-rightbrace
+t = rightbrace
+a = S-minus
+s = minus
+d = equal
+f = S-equal
+
+[shift]
+capslock = capslock ' > /etc/keyd/default.conf
+
+
+systemctl enable keyd
+
+
+## source 
+# https://github.com/rvaiya/keyd
+
+
+
 
 
 
