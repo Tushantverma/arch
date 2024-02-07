@@ -245,7 +245,7 @@ echo "##########################################################################
 # linux-lts
 # linux-zen
 
-pacstrap /mnt base base-devel linux-lts linux-firmware neovim btrfs-progs sed
+pacstrap /mnt base base-devel linux-lts linux-firmware neovim btrfs-progs sed git
    
 genfstab -U -p /mnt >> /mnt/etc/fstab
 # The -p flag include all the partitions including those that are not currently mounted... -U flags tells use UUID in fstab
@@ -362,16 +362,16 @@ pacman -Syyy
 
 
 
-echo "##########################################################################"
-echo "######################## getting arco key and repo #######################"
-echo "##########################################################################"
+# echo "##########################################################################"
+# echo "######################## getting arco key and repo #######################"
+# echo "##########################################################################"
 
-pacman -S --noconfirm git
-git clone --depth 1 https://github.com/arcolinux/arcolinux-spices.git
-./arcolinux-spices/usr/share/arcolinux-spices/scripts/get-the-keys-and-repos.sh
-pacman -Syyy
-rm -rf arcolinux-spices
-# source :- https://www.arcolinux.info/arcolinux-spices-application/
+# -------------------------- arcolinux is gone forever ------------------------- #
+# git clone --depth 1 https://github.com/arcolinux/arcolinux-spices.git
+# ./arcolinux-spices/usr/share/arcolinux-spices/scripts/get-the-keys-and-repos.sh
+# pacman -Syyy
+# rm -rf arcolinux-spices
+# # source :- https://www.arcolinux.info/arcolinux-spices-application/
 
 
 echo "##########################################################################"
@@ -402,49 +402,64 @@ echo "##########################################################################
 
 pkgs=(
 
-############### Display pkg ################
-xorg-server
-xorg-apps
-xorg-xinit
-mesa
-intel-ucode  # amd-ucode (for AMD graphics)
-# xf86-video-intel ## not installing this pkg because its changing display name, giving error for other pkg (eg. vibrent-linux)
-
+### Core system ###
 grub
 grub-btrfs
 efibootmgr
+os-prober
+intel-ucode           # amd-ucode (for AMD graphics)
+mesa                  # OpenGL/Mesa drivers
+# xf86-video-intel    # not installing this pkg because its changing display name, giving error for other pkg (eg. vibrent-linux)
+
+### X11 stack (required for running X11 session) ###
+xorg-server
+xorg-apps
+xorg-xinit
+
+### X11-only packages (not Wayland-compatible)
+feh
+sxhkd
+xclip
+xdotool   # for autotype
+unclutter # hide cursor after some time
+rofi
+xfce4-terminal
+
+### Networking ###
 networkmanager
 network-manager-applet
-os-prober
-bash-completion
+net-tools        # ifconfig, netstat, etc
+wireless_tools   # iwconfig, old wireless utils
 
+### Audio ###
+pulseaudio
+pulseaudio-alsa
+pavucontrol
+alsa-utils
+
+### File systems / partitioning ###
 gparted
 dosfstools    # required by gparted
 mtools	      # required by gparted
+ntfs-3g       # NTFS support
 
+### Shell & CLI productivity ###
+bash-completion
+fzf
+chezmoi
+tree
+plocate # locate command # update database with "$sudo updatedb" command
+tldr    # -------------- # update database/cache with "$tldr --update/-u" command
 bat
 htop
 fastfetch
-sublime-text-4
-yay
-thunar
-gvfs
-gvfs-afc
-thunar-volman
-tumbler
-ffmpegthumbnailer
-thunar-archive-plugin
-thunar-media-tags-plugin
-pavucontrol
-mpv
-pulseaudio
-pulseaudio-alsa
-ntfs-3g
-feh
-xfce4-terminal
-sxhkd
-rofi
 repgrep # better replacement of "ripgrep" ## GUI alternative is "catfish"
+man-db
+
+#### for zsh ####
+zsh
+# zsh-fast-syntax-highlighting  # better replacement of "zsh-syntax-highlighting"  ## was comming from arcolinux repo
+# zsh-autosuggestions
 
 ### fonts ###
 ttf-iosevka-nerd
@@ -452,53 +467,44 @@ ttf-indic-otf # hindi fonts
 noto-fonts
 noto-fonts-emoji 
 
-polkit-gnome
-man-db
-fzf
-xclip
-chezmoi
-tree
-
-plocate # locate command # update database with "$sudo updatedb" command
-tldr    # -------------- # update database/cache with "$tldr --update/-u" command
-
-light
-alsa-utils
-net-tools
-wireless_tools
-
-# file extractor
-engrampa # "file-roller" have more option but it's theming is odd (second best option would be "xarchiver")
-unrar
-
-yt-dlp
-meld
-reflector
-unclutter # hide cursor after some time
-xdotool   # for autotype
-keyd      # remaping keys for keyboard
-
 #### themes ####
-lxappearance
+nwg-look  # for gtk-2.0 , gtk-3.0 , gtk-4.0 all    ###  lxappearance : only for gtk-2.0  ### lxappearance-gtk3 : only for gtk-3.0
 qt5ct
+xcursor-breeze
+surfn-icons-git
 # a-candy-beauty-icon-theme-git
 # sweet-cursor-theme-git
 # sweet-gtk-theme-dark
-xcursor-breeze
-arc-blackest-theme-git
-surfn-icons-git
+# arc-blackest-theme-git  ## was comming from arcolinux repo
 # epapirus-icon-theme
 
-#### for zsh ####
-zsh
-zsh-fast-syntax-highlighting  # better replacement of "zsh-syntax-highlighting"
-# zsh-autosuggestions
+### File management ###
+thunar
+gvfs
+gvfs-afc            # iOS device support
+thunar-volman
+tumbler
+ffmpegthumbnailer   # generate video thumbnails for file managers
+thunar-archive-plugin
+thunar-media-tags-plugin
+engrampa            # "file-roller" have more option but it's theming is odd (second best option would be "xarchiver")
+unrar
 
-#### user app ####
+### System utilities ###
+polkit-gnome  # polkit authentication agent for GNOME/GTK environments
+light         # brightness control
+reflector     # mirror ranking/updating
+keyd          # remaping keys for keyboard
+yay           # AUR helper
+
+#### media / apps ####
 firefox
 obsidian
 flameshot
-
+sublime-text-4
+meld
+mpv
+yt-dlp
 
 )
 
@@ -736,23 +742,21 @@ systemctl enable keyd
 
 
 
-echo "##########################################################################"
-echo "##################### installing display manager #########################"
-echo "##########################################################################"
+# echo "##########################################################################"
+# echo "##################### installing display manager #########################"
+# echo "##########################################################################"
 
 # $startx (how to use) or $startx awesome
-	#   .xinitrc {
-	# 	exec wm
-	# 	or 
-	# 	exec <path to wm>
-	# }
-
+#	   .xinitrc {
+#	 	exec wm
+#	 	or 
+#	 	exec <path to wm>
+#	 }
 
 ### install lightdm
 # sudo pacman -S lightdm
 # sudo pacman -S lightdm-gtk-greeter lightdm-gtk-greeter-settings
 # sudo systemctl enable lightdm.service
-
 
 ### install sddm
 # sudo pacman -S sddm
