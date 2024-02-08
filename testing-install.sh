@@ -430,6 +430,7 @@ networkmanager
 network-manager-applet
 net-tools        # ifconfig, netstat, etc
 wireless_tools   # iwconfig, old wireless utils
+wget             # CLI tool to download files from the web
 
 ### Audio ###
 pulseaudio
