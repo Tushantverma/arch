@@ -39,9 +39,9 @@ echo "##########################################################################
 
 setup_pacman_conf() {
 
-	sed -i 's/#Color/Color/'                                                     /etc/pacman.conf   # enable color for pacman
-	sed -i 's/#VerbosePkgLists/VerbosePkgLists/'                                 /etc/pacman.conf   # show difference b/w old and new packages version
-	sed -i 's/^#ParallelDownloads = 5$/ParallelDownloads = 15/'                  /etc/pacman.conf   # enable parallel downloads
+	sed -i 's/^#Color$/Color/'                                                   /etc/pacman.conf   # enable color for pacman
+	sed -i 's/^#VerbosePkgLists$/VerbosePkgLists/'                               /etc/pacman.conf   # show difference b/w old and new packages version
+	sed -i 's/^ParallelDownloads = 5$/ParallelDownloads = 15/'                   /etc/pacman.conf   # enable parallel downloads
 	sed -i '/^ParallelDownloads = [0-9]\+$/a ILoveCandy\nDisableDownloadTimeout' /etc/pacman.conf   # added ILoveCandy and (DisableDownloadTimeout for slow internet) after Parallel Downloads line
 	sed -i '/\[multilib\]/,/Include/''s/^#//'                                    /etc/pacman.conf   # uncomment multilib repo
 	# source https://github.com/arcolinux/arcolinuxl-iso/blob/master/archiso/pacman.conf
