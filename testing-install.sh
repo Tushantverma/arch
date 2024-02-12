@@ -118,8 +118,10 @@ lsblk -p  ## -p => prints full device path
 # dd if=/dev/zero of=/dev/sda bs=1M  ###(to complete wipe full file system or full partition by adding random data 1 time)
 # shred -vfz /dev/sda ###(to complete wipe full file system or full partition by adding random data 4 time) (most secure way. time taking) not good for ssd life
 # shred -n 1 -vfz /dev/sda ### -n 1 means format 1 time only. but if you use -n 1 with -z flag. it will format two time .. one time with random data and second time with zero's in total it will format two time
+                           ### -z flag make hard-drive looks like new.. like Data is never written to the hard-disk.
                            ### -n 1 reduce the number of format to 1 by default its 4 time , 
                            ### -v = verbose , -f = force , -z = fill with zero and , -s <num> = fill with any number not just zero , -u file.txt , '-r -u my_directory' to delete all files in a directory recursively
+                           ### shred -n 1 -vfz /dev/sdaX : to format sub-partition of the drive NOT the entire drive ## 
 
 read -ep "$(tput setaf 2)Enter the BOOT partition (e.g. /dev/sdaX) : $(tput sgr0)"  bootpartition 
 wipefs -af $bootpartition  # wipe boot file signature forcefully
