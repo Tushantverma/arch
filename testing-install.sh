@@ -701,7 +701,7 @@ echo '
 *
 
 [main]
-compose = overload(meta, compose)
+compose = overload(meta, noop)
 capslock = overload(mylayer1, esc)
 backslash = overload(mylayer2, backslash)
 
