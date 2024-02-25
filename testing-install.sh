@@ -362,7 +362,7 @@ echo "########### setting up /etc/pacman.conf (for Main System) ################
 echo "##########################################################################"
 
 setup_pacman_conf # executing exported function to setup pacman.conf for main system
-pacman -Syyy
+# pacman -Syyy
 
 
 
@@ -379,7 +379,7 @@ pacman -Syyy
 
 
 echo "##########################################################################"
-echo "######################## installing Chaotic AUR ##########################"
+echo "######################## Installing Chaotic-AUR ##########################"
 echo "##########################################################################"
 ##-----------------------------------------------------------------------------##
 pacman-key --recv-key  3056513887B78AEB --keyserver keyserver.ubuntu.com
@@ -396,8 +396,23 @@ echo "
 [chaotic-aur]
 Include = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
 
-pacman -Syyy
+# pacman -Syyy
 # source https://aur.chaotic.cx/
+
+echo "##########################################################################"
+echo "####################### Installing Bharat-OS Repo ########################"
+echo "##########################################################################"
+
+curl -s https://github.com/osbharat.gpg | pacman-key --add -
+pacman-key --lsign-key 8BEA9013870E52B8 # key_id is the last 16 characters of the fingerprint
+
+echo '
+[Bharat-OS]
+Server = https://osbharat.github.io/BharatOS/repo/$arch' >> /etc/pacman.conf
+
+# find the keyid
+# curl -s https://github.com/osbharat.gpg | gpg --with-colons --show-keys - | awk -F: '/^pub/ {print $5}'  # new method (primary)
+# curl -s https://github.com/osbharat.gpg | gpg --with-colons --import-options show-only --import - | awk -F: '/^pub/ {print $5}' # old method (secondary)
 
 
 echo "##########################################################################"
@@ -463,7 +478,7 @@ man-db
 
 #### for zsh ####
 zsh
-# zsh-fast-syntax-highlighting  # better replacement of "zsh-syntax-highlighting"  ## was comming from arcolinux repo
+zsh-fast-syntax-highlighting  # better replacement of "zsh-syntax-highlighting"  ## Bharat-OS
 # zsh-autosuggestions
 
 ### fonts ###
@@ -477,6 +492,7 @@ nwg-look  # for gtk-2.0 , gtk-3.0 , gtk-4.0 all    ###  lxappearance : only for 
 qt5ct
 xcursor-breeze
 surfn-icons-git
+arc-dark-purple-bharatos  ## Bharat-OS
 # a-candy-beauty-icon-theme-git
 # sweet-cursor-theme-git
 # sweet-gtk-theme-dark
@@ -513,7 +529,7 @@ yt-dlp
 
 )
 
-pacman -S --noconfirm --needed "${pkgs[@]}"
+pacman -Syyy --noconfirm --needed "${pkgs[@]}"
 
 
 
