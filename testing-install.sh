@@ -7,6 +7,23 @@
 # curl -o install.sh -L https://raw.githubusercontent.com/Tushantverma/arch/main/testing-install.sh    ## you can get the script this way without git clone
 
 
+echo "##########################################################################"
+echo "############### launch script into tmux and collect logs #################"
+echo "##########################################################################"
+
+sed -n '/^##part11$/,/^##part44$/p' ${0} > /tmp/myarchscript.sh 
+chmod +x /tmp/myarchscript.sh 
+
+tmux new-session \
+ -s "myscript_session" \
+ -d "bash /tmp/myarchscript.sh 2>&1 | tee /tmp/script.log ; exec zsh "
+ tmux attach -t "myscript_session"
+
+rm -rf /tmp/myarchscript.sh 
+exit
+
+
+
 #part11
 echo "##########################################################################"
 echo "################### checking internet connection #########################"
@@ -837,4 +854,4 @@ su - $username -c "chezmoi init --apply https://github.com/tushantverma/dotfiles
 ./home/$username/.bin/1_setup_all.sh
 
 
-
+#part44
