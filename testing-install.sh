@@ -11,7 +11,7 @@ echo "##########################################################################
 echo "############### launch script into tmux and collect logs #################"
 echo "##########################################################################"
 
-sed -n '/^##part11$/,/^##part44$/p' ${0} > /tmp/myarchscript.sh 
+sed -n '/^#part11$/,/^#part44$/p' ${0} > /tmp/myarchscript.sh 
 chmod +x /tmp/myarchscript.sh 
 
 tmux new-session \
