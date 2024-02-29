@@ -16,7 +16,7 @@ chmod +x /tmp/myarchscript.sh
 
 tmux new-session \
  -s "myscript_session" \
- -d "bash /tmp/myarchscript.sh 2>&1 | tee /tmp/script.log ; exec zsh "
+ -d "bash /tmp/myarchscript.sh | tee /tmp/script.log ; exec zsh "
  tmux attach -t "myscript_session"
 
 rm -rf /tmp/myarchscript.sh 
