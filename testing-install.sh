@@ -14,10 +14,10 @@ echo "##########################################################################
 sed -n '/^#part11$/,/^#part44$/p' ${0} > /tmp/myarchscript.sh 
 chmod +x /tmp/myarchscript.sh 
 
-tmux new-session \
- -s "myscript_session" \
- -d "bash /tmp/myarchscript.sh | tee /tmp/script.log ; exec zsh "
- tmux attach -t "myscript_session"
+tmux new -s mybuffer \
+"tmux set -g history-limit 10000 ; \
+bash /tmp/myarchscript.sh ; zsh ; \
+tmux capture-pane -pS - -e -J > /tmp/myarchlogfile.txt"
 
 rm -rf /tmp/myarchscript.sh 
 exit
