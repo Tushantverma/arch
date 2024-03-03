@@ -16,6 +16,7 @@ chmod +x /tmp/myarchscript.sh
 
 tmux set-option -g history-limit 100000 \; new-session -s mybuffer \
 "bash /tmp/myarchscript.sh ; zsh ; tmux capture-pane -pS - -e -J > /tmp/myarchlogfile.txt"
+## \; This separator tells tmux to execute the next command in the same sequence
 
 rm -rf /tmp/myarchscript.sh
 exit
