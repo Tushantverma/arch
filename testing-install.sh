@@ -71,7 +71,8 @@ echo "##########################################################################
 echo "###### setting keyboard layout (optional defaulat is already 'us') #######"
 echo "##########################################################################"
 
-loadkeys us
+loadkeys us # Changes layout now (temporarily)
+echo "KEYMAP=us" > /etc/vconsole.conf # Sets layout for next boot (persistent)
 
 echo "##########################################################################"
 echo "########################## checking UEFI BOOT only #######################"
@@ -357,8 +358,8 @@ echo "##########################################################################
 echo "###### setting keyboard layout (optional defaulat is already 'us') #######"
 echo "####################### only do if you did above #########################"
 
-echo "KEYMAP=us" > /etc/vconsole.conf
-
+loadkeys us  # Changes layout now (temporarily)
+echo "KEYMAP=us" > /etc/vconsole.conf  # Sets layout for next boot (persistent)
 
 echo "##########################################################################"
 echo "########################### setting up your HOST #########################"
