@@ -67,12 +67,12 @@ setup_pacman_conf() {
 setup_pacman_conf && export -f setup_pacman_conf # execute the function and export it for chroot / main system
 
 
-echo "##########################################################################"
-echo "###### setting keyboard layout (optional defaulat is already 'us') #######"
-echo "##########################################################################"
+# echo "##########################################################################"
+# echo "###### setting keyboard layout (optional defaulat is already 'us') #######"
+# echo "##########################################################################"
 
-loadkeys us # Changes layout now (temporarily)
-echo "KEYMAP=us" > /etc/vconsole.conf # Sets layout for next boot (persistent)
+# loadkeys us # Changes layout now (temporarily)
+# echo "KEYMAP=us" > /etc/vconsole.conf # Sets layout for next boot (persistent)
 
 echo "##########################################################################"
 echo "########################## checking UEFI BOOT only #######################"
@@ -256,6 +256,14 @@ reflector -a 48 -c $iso -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
 # for more details : https://wiki.archlinux.org/title/Pacman/Package_signing
 
 echo "##########################################################################"
+echo "####################### setting up keyboard layout #######################"
+echo "##########################################################################"
+
+loadkeys us # Changes layout now (temporarily)
+mkdir -p /mnt/etc/
+echo "KEYMAP=us" > /mnt/etc/vconsole.conf # Sets layout for next boot (persistent)
+
+echo "##########################################################################"
 echo "########################## installing base system ########################"
 echo "##########################################################################"
 
@@ -354,12 +362,12 @@ echo "LANG=en_US.UTF-8" > /etc/locale.conf
 
 
 
-echo "##########################################################################"
-echo "###### setting keyboard layout (optional defaulat is already 'us') #######"
-echo "####################### only do if you did above #########################"
+# echo "##########################################################################"
+# echo "###### setting keyboard layout (optional defaulat is already 'us') #######"
+# echo "####################### only do if you did above #########################"
 
-loadkeys us  # Changes layout now (temporarily)
-echo "KEYMAP=us" > /etc/vconsole.conf  # Sets layout for next boot (persistent)
+# loadkeys us  # Changes layout now (temporarily)
+# echo "KEYMAP=us" > /etc/vconsole.conf  # Sets layout for next boot (persistent)
 
 echo "##########################################################################"
 echo "########################### setting up your HOST #########################"
