@@ -19,7 +19,6 @@ tmux set-option -g history-limit 100000 \; new-session -s mybuffer \
 ## \; This separator tells tmux to execute the next command in the same sequence
 
 rm -rf /tmp/myarchscript.sh
-echo "Rebooting in 30s..."; sleep 30 ; reboot
 exit
 
 
@@ -308,6 +307,7 @@ echo "==========Installation Done=========="
 read -t 30 -p "arch-chroot /mnt ? (y/N): " choice
 [[ ${choice,,} = y ]] && arch-chroot /mnt
 umount -R /mnt # unmount anyway
+echo "Rebooting in 30s..."; sleep 30 ; reboot
 
 
 exit
