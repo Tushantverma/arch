@@ -854,7 +854,8 @@ echo "##########################################################################
 
 #part33
 
-su - $username -c "chezmoi init --apply https://github.com/tushantverma/dotfiles"
+# su - $username -c "chezmoi init --apply https://github.com/tushantverma/dotfiles"  # gives error : "tty: ttyname error: No such device" but final executed result is fine
+sudo -u $username -H chezmoi init --apply https://github.com/tushantverma/dotfiles   # -H: Sets $HOME to the target user's home directory (/home/username) ; good for billow 1_setup_all.sh script
 ./home/$username/.bin/1_setup_all.sh
 
 
