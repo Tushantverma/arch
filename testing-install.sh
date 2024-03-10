@@ -15,10 +15,14 @@ sed -n '/^#part11$/,/^#part44$/p' ${0} > /tmp/myarchscript.sh
 chmod +x /tmp/myarchscript.sh 
 
 tmux set-option -g history-limit 100000 \; new-session -s mybuffer \
-"bash /tmp/myarchscript.sh ; zsh ; tmux capture-pane -pS - -e -J > /tmp/myarchlogfile.txt"
+"bash /tmp/myarchscript.sh ; tmux capture-pane -pS - -e -J > /tmp/myarchlogfile.txt " # ;zsh" : type zsh to pause script in tmux
 ## \; This separator tells tmux to execute the next command in the same sequence
+## ctrl+c on tmux to stop process works on main machine and virtaulbox but not on qemu-virtmanager
 
 rm -rf /tmp/myarchscript.sh
+echo "log history is saved in /tmp/myarchlogfile.txt"
+echo "Rebooting in 10s..."; sleep 10 ; reboot 
+
 exit
 
 
@@ -304,10 +308,9 @@ rm -rf /mnt/install2.sh
 
 
 echo "==========Installation Done=========="
-read -t 30 -p "arch-chroot /mnt ? (y/N): " choice
+read -t 10 -p "arch-chroot /mnt ? (y/N): " choice
 [[ ${choice,,} = y ]] && arch-chroot /mnt
 umount -R /mnt # unmount anyway
-echo "Rebooting in 30s..."; sleep 30 ; reboot
 
 
 exit
