@@ -15,13 +15,13 @@ sed -n '/^#part11$/,/^#part44$/p' ${0} > /tmp/myarchscript.sh
 chmod +x /tmp/myarchscript.sh 
 
 tmux set-option -g history-limit 100000 \; new-session -s mybuffer \
-"bash /tmp/myarchscript.sh ; tmux capture-pane -pS - -e -J > /tmp/myarchlogfile.txt " # ;zsh" : type zsh to pause script in tmux
+"bash /tmp/myarchscript.sh ; tmux capture-pane -pS - -e -J > /tmp/myarchlogfile.txt ; zsh" # type zsh to pause script in tmux
 ## \; This separator tells tmux to execute the next command in the same sequence
 ## ctrl+c on tmux to stop process works on main machine and virtaulbox but not on qemu-virtmanager
 
 rm -rf /tmp/myarchscript.sh
-echo "log history is saved in /tmp/myarchlogfile.txt"
-echo "Rebooting in 10s..."; sleep 10 ; reboot 
+# echo "log history is saved in /tmp/myarchlogfile.txt"
+# echo "Rebooting in 10s..."; sleep 10 ; reboot 
 
 exit
 
@@ -858,8 +858,18 @@ echo "##########################################################################
 #part33
 
 # su - $username -c "chezmoi init --apply https://github.com/tushantverma/dotfiles"  # gives error : "tty: ttyname error: No such device" but final executed result is fine
-sudo -u $username -H chezmoi init --apply https://github.com/tushantverma/dotfiles   # -H: Sets $HOME to the target user's home directory (/home/username) ; good for billow 1_setup_all.sh script
-./home/$username/.bin/1_setup_all.sh
+
+# sudo -u $username -H chezmoi init --apply https://github.com/tushantverma/dotfiles   # -H: Sets $HOME to the target user's home directory (/home/username) ; good for billow 1_setup_all.sh script
+# sudo -u $username -H /home/$username/.bin/1_setup_all.sh
+
+ sudo -u $username -H bash -c '
+  echo "myUser : $USER" ; echo "myHome : $HOME"
+  echo
+  chezmoi init --apply https://github.com/tushantverma/dotfiles
+  ~/.bin/1_setup_all.sh 
+'
+
+
 
 
 #part44
