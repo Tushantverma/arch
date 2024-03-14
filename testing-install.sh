@@ -857,18 +857,15 @@ echo "##########################################################################
 
 #part33
 
-# su - $username -c "chezmoi init --apply https://github.com/tushantverma/dotfiles"  # gives error : "tty: ttyname error: No such device" but final executed result is fine
 
-# sudo -u $username -H chezmoi init --apply https://github.com/tushantverma/dotfiles   # -H: Sets $HOME to the target user's home directory (/home/username) ; good for billow 1_setup_all.sh script
-# sudo -u $username -H /home/$username/.bin/1_setup_all.sh
+# su - $username -c "chezmoi init --apply https://github.com/tushantverma/dotfiles"  
+# gives error : "tty: ttyname error: No such device" but final executed result is fine
 
- sudo -u $username -H bash -c '
-  echo "myUser : $USER" ; echo "myHome : $HOME"
-  echo
-  chezmoi init --apply https://github.com/tushantverma/dotfiles
-  ~/.bin/1_setup_all.sh 
-'
+sudo -u $username -H chezmoi init --apply https://github.com/tushantverma/dotfiles
+# -H: Sets $HOME to the target user's home directory (/home/username)
 
+/home/$username/.bin/1_setup_all.sh
+# if this script run as a USER, sudo inside will prompt you for the password
 
 
 
