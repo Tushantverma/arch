@@ -15,12 +15,13 @@ sed -n '/^#part11$/,/^#part44$/p' ${0} > /tmp/myarchscript.sh
 chmod +x /tmp/myarchscript.sh 
 
 tmux set-option -g history-limit 100000 \; new-session -s mybuffer \
-"bash /tmp/myarchscript.sh ; tmux capture-pane -pS - -e -J > /tmp/myarchlogfile.txt ; zsh" # type zsh to pause script in tmux
+"bash /tmp/myarchscript.sh ; rm -rf /tmp/myarchscript.sh ; \
+tmux capture-pane -pS - -e -J > /tmp/myarchlogfile.txt ; \
+echo 'log history : /tmp/myarchlogfile.txt' ; \
+echo '====== Type reboot ======' ; exec zsh" # type zsh to pause script in tmux (pause when scrolling to history)
 ## \; This separator tells tmux to execute the next command in the same sequence
 ## ctrl+c on tmux to stop process works on main machine and virtaulbox but not on qemu-virtmanager
 
-rm -rf /tmp/myarchscript.sh
-# echo "log history is saved in /tmp/myarchlogfile.txt"
 # echo "Rebooting in 10s..."; sleep 10 ; reboot 
 
 exit
@@ -308,10 +309,28 @@ rm -rf /mnt/install2.sh
 
 
 echo "==========Installation Done=========="
-read -t 10 -p "arch-chroot /mnt ? (y/N): " choice
-[[ ${choice,,} = y ]] && arch-chroot /mnt
-umount -R /mnt # unmount anyway
+read -t 10 -p "arch-chroot -S /mnt ? (y/N): " choice
+[[ ${choice,,} = y ]] && arch-chroot -S /mnt
 
+# arch-chroot -S /mnt
+# -S : Runs arch-chroot in a separate session so the parent script
+#      does NOT suspend or terminate when you exit the chroot.
+#      This allows the script to continue and run the next commands.
+#
+# Without -S, an interactive arch-chroot session can suspend or kill
+#      the parent script on exit, which breaks automation.
+#
+# Alternative approach:
+#      openvt -s -w -- arch-chroot /mnt
+#      Runs chroot inside a separate VT to isolate the environment.
+#      (need testing)
+#
+# You can also use plain "chroot /mnt" if a minimal environment is fine.
+#
+# Note: Using arch-chroot interactively inside scripts is unreliable
+#       unless isolation (-S, openvt, or similar) is used.
+
+umount -R /mnt # recursive unmount
 
 exit
 
