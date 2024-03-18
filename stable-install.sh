@@ -7,6 +7,27 @@
 # curl -o install.sh -L https://raw.githubusercontent.com/Tushantverma/arch/main/testing-install.sh    ## you can get the script this way without git clone
 
 
+echo "##########################################################################"
+echo "############### launch script into tmux and collect logs #################"
+echo "##########################################################################"
+
+sed -n '/^#part11$/,/^#part44$/p' ${0} > /tmp/myarchscript.sh 
+chmod +x /tmp/myarchscript.sh 
+
+tmux set-option -g history-limit 100000 \; new-session -s mybuffer \
+"bash /tmp/myarchscript.sh ; rm -rf /tmp/myarchscript.sh ; \
+tmux capture-pane -pS - -e -J > /tmp/myarchlogfile.txt ; \
+echo 'log history : /tmp/myarchlogfile.txt' ; \
+echo '====== Type reboot ======' ; exec zsh" # type zsh to pause script in tmux (pause when scrolling to history)
+## \; This separator tells tmux to execute the next command in the same sequence
+## ctrl+c on tmux to stop process works on main machine and virtaulbox but not on qemu-virtmanager
+
+# echo "Rebooting in 10s..."; sleep 10 ; reboot 
+
+exit
+
+
+
 #part11
 echo "##########################################################################"
 echo "################### checking internet connection #########################"
@@ -33,17 +54,24 @@ echo "##########################################################################
 
 
 echo "##########################################################################"
-echo "######################### parallel download ##############################"
+echo "############### setting up /etc/pacman.conf (for live ISO) ###############"
 echo "##########################################################################"
 
-sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 15/" /etc/pacman.conf
+
+setup_pacman_conf() {
+
+	sed -i 's/^#Color$/Color/'                                                   /etc/pacman.conf   # enable color for pacman
+	sed -i 's/^#VerbosePkgLists$/VerbosePkgLists/'                               /etc/pacman.conf   # show difference b/w old and new packages version
+	sed -i 's/^ParallelDownloads = 5$/ParallelDownloads = 15/'                   /etc/pacman.conf   # enable parallel downloads
+	sed -i '/^ParallelDownloads = [0-9]\+$/a ILoveCandy\nDisableDownloadTimeout' /etc/pacman.conf   # added ILoveCandy and (DisableDownloadTimeout for slow internet) after Parallel Downloads line
+	sed -i '/\[multilib\]/,/Include/''s/^#//'                                    /etc/pacman.conf   # uncomment multilib repo
+	# source https://github.com/arcolinux/arcolinuxl-iso/blob/master/archiso/pacman.conf
+
+}
+
+setup_pacman_conf && export -f setup_pacman_conf # execute the function and export it for chroot / main system
 
 
-echo "##########################################################################"
-echo "###### setting keyboard layout (optional defaulat is already 'us') #######"
-echo "##########################################################################"
-
-loadkeys us
 
 echo "##########################################################################"
 echo "########################## checking UEFI BOOT only #######################"
@@ -69,12 +97,12 @@ echo "##########################################################################
 echo "##### assigning all variables at once to export into arch-chroot #########"
 echo "##########################################################################"
 
-read -ep "write HostName/NickName for the OS(tv): " hostname && export hostname
+read -ep "$(tput setaf 2)Enter your HostName(tv) : $(tput sgr0)"               hostname && export hostname
 
-read -ep "Enter Your UserName : "                   username && export username
-read -ep "Enter Your UserPass : "                   userpass && export userpass
+read -ep "$(tput setaf 2)Enter Your UserName : $(tput sgr0)"                   username && export username
+read -ep "$(tput setaf 2)Enter Your UserPass : $(tput sgr0)"                   userpass && export userpass
 
-read -ep "Enter Your RootPass : "                   rootpass && export rootpass
+read -ep "$(tput setaf 2)Enter Your RootPass : $(tput sgr0)"                   rootpass && export rootpass
 
 
 
@@ -85,15 +113,19 @@ echo "##########################################################################
 lsblk -p  ## -p => prints full device path
 # $fdisk -l (alternetive shows full drive name with /dev/sdaX) 
 
-echo "#################################"
-echo "##### THIS IS BTRFS INSTALL #####"
-echo "##### YOU DON'T NEED TO DELETE AND RECREATE PARTITION IF IT'S ALREADY THERE JUST ENTER IN CFDISK CHECK EVERYTHING THEN QUIT #####"
+tput setaf 3 # Yellow Color
+echo "##########################################################################################"
+echo "#                                THIS IS A BTRFS INSTALL                                 #"
+echo "# YOU DON'T NEED TO DELETE AND RE-CREATE SAME PARTITIONS TO FORMAT IF IT'S ALREADY THERE #"
+echo "#          THE SCRIPT WILL DELETE THE SELECTED PARTITION (NOT DRIVE) AUTOMATICALLY       #"
+echo "#                JUST ENTER IN CFDISK CHECK EVERYTHING GOOD THEN QUIT                    #"
+echo "##########################################################################################"
+tput sgr0  # Reset Color
 
-echo "Enter the drive (/dev/sda) : "
-read drive
+read -ep "$(tput setaf 2)Enter the drive (e.g. /dev/sda) : $(tput sgr0)"  drive 
 cfdisk $drive 
 
-sleep 5s
+sleep 2s
 lsblk -p  ## -p => prints full device path
 
 ######## how to wipe your file signature/ complete wipe your disk or partition ############
@@ -101,21 +133,22 @@ lsblk -p  ## -p => prints full device path
 # wipefs -t ext4 /dev/sda  ###(to wipe only specific file signature only not all file signature) faster method (never tried)
 # dd if=/dev/zero of=/dev/sda bs=1M  ###(to complete wipe full file system or full partition by adding random data 1 time)
 # shred -vfz /dev/sda ###(to complete wipe full file system or full partition by adding random data 4 time) (most secure way. time taking) not good for ssd life
-# shred -n 1 -vfz /dev/sda ### (-n 1 means format 1 time. by default its 4 time , -v = verbose , -f = force , -z = fill with zero and -s <num> = fill with any number not just zero , -u file.txt , -r -u my_directory to delete all files in a directory recursively
+# shred -n 1 -vfz /dev/sda ### -n 1 means format 1 time only. but if you use -n 1 with -z flag. it will format two time .. one time with random data and second time with zero's in total it will format two time
+                           ### -z flag make hard-drive looks like new.. like Data is never written to the hard-disk.
+                           ### -n 1 reduce the number of format to 1 by default its 4 time , 
+                           ### -v = verbose , -f = force , -z = fill with zero and , -s <num> = fill with any number not just zero , -u file.txt , '-r -u my_directory' to delete all files in a directory recursively
+                           ### shred -n 1 -vfz /dev/sdaX : to format sub-partition of the drive NOT the entire drive ## 
 
-echo "Enter the BOOT partition (/dev/sdaX) : "
-read bootpartition
+read -ep "$(tput setaf 2)Enter the BOOT partition (e.g. /dev/sdaX) : $(tput sgr0)"  bootpartition 
 wipefs -af $bootpartition  # wipe boot file signature forcefully
 mkfs.vfat -F32 $bootpartition 
 
-echo "Enter the SWAP partition (/dev/sdaX) : "
-read swappartition
+read -ep "$(tput setaf 2)Enter the SWAP partition (e.g. /dev/sdaX) : $(tput sgr0)"  swappartition 
 wipefs -af $swappartition # wipe swap file signature forcefully
 mkswap $swappartition -f    ###-f = forcefully if any error there
 swapon $swappartition
 
-echo "Enter the LINUX partition (/dev/sdaX) : "
-read linuxpartition
+read -ep "$(tput setaf 2)Enter the LINUX partition (e.g. /dev/sdaX) : $(tput sgr0)"  linuxpartition 
 wipefs -af $linuxpartition  # wipe linux file signature forcefully 
 mkfs.btrfs $linuxpartition -f   ###-f = forcefully if any error there
 
@@ -186,14 +219,31 @@ echo "##########################################################################
 
 
 pacman --noconfirm -Syyy archlinux-keyring reflector
-reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist
 
-# update your pacman keyring (if you have any issue try billow process one by one)
+iso=$(curl -4 ifconfig.co/country-iso)
+reflector -a 48 -c $iso -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
+# reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist  # old way
+# you can try : https://wiki.archlinux.org/title/mirrors
+
+# ---------------------update your pacman keyring------------------------#
+
+# after booting into Arch Live ISO Wait for 1 minute (don't run any command). it will use your internet to automatic sync/configure some files for your machine otherwise you may face keyring issue
+
+# archlinux-keyring-wkd-sync (--or--) /usr/bin/archlinux-keyring-wkd-sync   # (it refresh the priviously imported keyring)
+# if this above command is not working only then try billow commands
+
 # pacman -Syyy
-# pacman-key --init
+# pacman-key --init               <<<<<<<<<<<<----------------------------  # (it first deletes the priviously imported keyring and then assign new keyring)
 # pacman-key --populate
 # pacman-key --refresh-keys
-# pacman -S archlinux-keyring
+
+# timedatectl set-ntp true #(default is true already)
+# timedatectl set-timezone Asia/Kolkata
+
+# pacman -S archlinux-keyring     # if this failed by (invalid or corrupted package (PGP signature)) then
+#	pacman -Sc ; pacman -Scc
+#	rm -rf /etc/pacman.d/gnupg/*  # and run every above command again
+
 # pacman -S reflector
 # 	  mirror='sudo reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist'
 # 	  mirrora='sudo reflector --latest 30 --number 10 --sort age --save /etc/pacman.d/mirrorlist'
@@ -202,6 +252,15 @@ reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist
 # 	  mirrorx='sudo reflector --age 6 --latest 20  --fastest 20 --threads 5 --sort rate --protocol https --save /etc/pacman.d/mirrorlist'
 # reboot your system if problem is not fixed
 
+# for more details : https://wiki.archlinux.org/title/Pacman/Package_signing
+
+echo "##########################################################################"
+echo "####################### setting up keyboard layout #######################"
+echo "##########################################################################"
+
+loadkeys us # Changes layout now (temporarily)
+mkdir -p /mnt/etc/
+echo "KEYMAP=us" > /mnt/etc/vconsole.conf # Sets layout for next boot (persistent)
 
 echo "##########################################################################"
 echo "########################## installing base system ########################"
@@ -214,7 +273,7 @@ echo "##########################################################################
 # linux-lts
 # linux-zen
 
-pacstrap /mnt base base-devel linux-zen linux-firmware neovim btrfs-progs
+pacstrap /mnt base base-devel linux-lts linux-firmware neovim btrfs-progs sed git
    
 genfstab -U -p /mnt >> /mnt/etc/fstab
 # The -p flag include all the partitions including those that are not currently mounted... -U flags tells use UUID in fstab
@@ -241,12 +300,38 @@ arch-chroot /mnt ./install2.sh
 rm -rf /mnt/install2.sh
 
 # after running the #part2 unmount /mnt and reboot
-echo "unmount /mnt && exit script in 10 second"
-echo "you can use ## 'arch-chroot /mnt'  now "
-sleep 10s
-umount -R /mnt
+# echo "unmount /mnt && exit script in 10 second"
+# echo "you can use ## 'arch-chroot /mnt'  now "
+# sleep 10s
+# umount -R /mnt
 
-echo "installaion DONE you can reboot now"
+# echo "installaion DONE you can reboot now"
+
+
+echo "==========Installation Done=========="
+read -t 10 -p "arch-chroot -S /mnt ? (y/N): " choice
+[[ ${choice,,} = y ]] && arch-chroot -S /mnt
+
+# arch-chroot -S /mnt
+# -S : Runs arch-chroot in a separate session so the parent script
+#      does NOT suspend or terminate when you exit the chroot.
+#      This allows the script to continue and run the next commands.
+#
+# Without -S, an interactive arch-chroot session can suspend or kill
+#      the parent script on exit, which breaks automation.
+#
+# Alternative approach:
+#      openvt -s -w -- arch-chroot /mnt
+#      Runs chroot inside a separate VT to isolate the environment.
+#      (need testing)
+#
+# You can also use plain "chroot /mnt" if a minimal environment is fine.
+#
+# Note: Using arch-chroot interactively inside scripts is unreliable
+#       unless isolation (-S, openvt, or similar) is used.
+
+umount -R /mnt # recursive unmount
+
 exit
 
 
@@ -303,13 +388,6 @@ echo "LANG=en_US.UTF-8" > /etc/locale.conf
 
 
 echo "##########################################################################"
-echo "###### setting keyboard layout (optional defaulat is already 'us') #######"
-echo "####################### only do if you did above #########################"
-
-echo "KEYMAP=us" > /etc/vconsole.conf
-
-
-echo "##########################################################################"
 echo "########################### setting up your HOST #########################"
 echo "##########################################################################"
 
@@ -323,46 +401,61 @@ echo "127.0.1.1       $hostname.localdomain $hostname" >> /etc/hosts
 
 
 echo "##########################################################################"
-echo "################## setting up Parallel Downloads in chroot ###############"
+echo "########### setting up /etc/pacman.conf (for Main System) ################"
 echo "##########################################################################"
 
-pacman -Syyy --noconfirm sed
-sed -i "s/^#ParallelDownloads = 5$/ParallelDownloads = 15/" /etc/pacman.conf
+setup_pacman_conf # executing exported function to setup pacman.conf for main system
+# pacman -Syyy
 
 
 
+# echo "##########################################################################"
+# echo "######################## getting arco key and repo #######################"
+# echo "##########################################################################"
 
-echo "##########################################################################"
-echo "#############################(( others ))#################################"
-echo "##########################################################################"
-
-# uncomment multilib in /etc/pacman.conf     [multilib] with sed try
-
-echo " "                                    >> /etc/pacman.conf
-echo "[multilib]"                           >> /etc/pacman.conf
-echo "Include = /etc/pacman.d/mirrorlist"   >> /etc/pacman.conf
-pacman -Syyy
-
-
-# reflector now needed after install it will get mirrorlist form live install to main system
-# check mkinitcpio.conf how to sed and add btrfs module
-
-
+# -------------------------- arcolinux is gone forever ------------------------- #
+# git clone --depth 1 https://github.com/arcolinux/arcolinux-spices.git
+# ./arcolinux-spices/usr/share/arcolinux-spices/scripts/get-the-keys-and-repos.sh
+# pacman -Syyy
+# rm -rf arcolinux-spices
+# # source :- https://www.arcolinux.info/arcolinux-spices-application/
 
 
 echo "##########################################################################"
-echo "######################## getting arco key and repo #######################"
+echo "######################## Installing Chaotic-AUR ##########################"
+echo "##########################################################################"
+##-----------------------------------------------------------------------------##
+pacman-key --recv-key  3056513887B78AEB --keyserver keyserver.ubuntu.com
+pacman-key --lsign-key 3056513887B78AEB
+
+pacman -U --noconfirm 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst'
+pacman -U --noconfirm 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'  
+##------------------------------ OR (uncomment one)----------------------------##
+# pacman -S arcolinux_repo_3party/chaotic-keyring
+# pacman -S arcolinux_repo_3party/chaotic-mirrorlist
+##-----------------------------------------------------------------------------##
+
+echo "
+[chaotic-aur]
+Include = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
+
+# pacman -Syyy
+# source https://aur.chaotic.cx/
+
+echo "##########################################################################"
+echo "####################### Installing Bharat-OS Repo ########################"
 echo "##########################################################################"
 
-pacman -S --noconfirm git
-git clone --depth 1 https://github.com/arcolinux/arcolinux-spices.git
-./arcolinux-spices/usr/share/arcolinux-spices/scripts/get-the-keys-and-repos.sh
-pacman -Syyy
-rm -rf arcolinux-spices
-# source :- https://www.arcolinux.info/arcolinux-spices-application/
+curl -s https://github.com/osbharat.gpg | pacman-key --add -
+pacman-key --lsign-key 8BEA9013870E52B8 # key_id is the last 16 characters of the fingerprint
 
+echo '
+[Bharat-OS]
+Server = https://osbharat.github.io/BharatOS/repo/$arch' >> /etc/pacman.conf
 
-
+# find the keyid
+# curl -s https://github.com/osbharat.gpg | gpg --with-colons --show-keys - | awk -F: '/^pub/ {print $5}'  # new method (primary)
+# curl -s https://github.com/osbharat.gpg | gpg --with-colons --import-options show-only --import - | awk -F: '/^pub/ {print $5}' # old method (secondary)
 
 
 echo "##########################################################################"
@@ -371,94 +464,115 @@ echo "##########################################################################
 
 pkgs=(
 
-############### Display pkg ################
-xorg-server
-xorg-apps
-xorg-xinit
-mesa
-intel-ucode  # amd-ucode (for AMD graphics)
-# xf86-video-intel ## not installing this pkg because its changing display name, giving error for other pkg (eg. vibrent-linux)
-
+### Core system ###
 grub
 grub-btrfs
 efibootmgr
+os-prober
+intel-ucode           # amd-ucode (for AMD graphics)
+mesa                  # OpenGL/Mesa drivers
+# xf86-video-intel    # not installing this pkg because its changing display name, giving error for other pkg (eg. vibrent-linux)
+
+### X11 stack (required for running X11 session) ###
+xorg-server
+xorg-apps
+xorg-xinit
+
+### X11-only packages (not Wayland-compatible)
+feh
+sxhkd
+xclip
+xdotool   # for autotype
+unclutter # hide cursor after some time
+rofi
+xfce4-terminal
+
+### Networking ###
 networkmanager
 network-manager-applet
-os-prober
-bash-completion
+net-tools        # ifconfig, netstat, etc
+wireless_tools   # iwconfig, old wireless utils
+wget             # CLI tool to download files from the web
 
+### Audio ###
+pulseaudio
+pulseaudio-alsa
+pavucontrol
+alsa-utils
+
+### File systems / partitioning ###
 gparted
 dosfstools    # required by gparted
 mtools	      # required by gparted
+ntfs-3g       # NTFS support
 
-bat
-htop
-neofetch
-sublime-text-4
-yay
-thunar
-gvfs
-gvfs-afc
-thunar-volman
-tumbler
-ffmpegthumbnailer
-thunar-archive-plugin
-thunar-media-tags-plugin
-pavucontrol
-mpv
-pulseaudio
-pulseaudio-alsa
-ntfs-3g
-feh
-xfce4-terminal
-sxhkd
-rofi
-repgrep # better replacement of "ripgrep"
-
-### fonts ###
-ttf-iosevka-nerd
-ttf-indic-otf
-noto-fonts
-
-polkit-gnome
-man-db
+### Shell & CLI productivity ###
+bash-completion
 fzf
-xclip
 chezmoi
 tree
-tldr
-light
-alsa-utils
-net-tools
-wireless_tools
-file-roller
-yt-dlp
-meld
-catfish
-
-#### themes ####
-lxappearance
-qt5ct
-a-candy-beauty-icon-theme-git
-sweet-cursor-theme-git
-sweet-gtk-theme-dark
-xcursor-breeze
-arc-blackest-theme-git
+plocate # locate command # update database with "$sudo updatedb" command
+tldr    # -------------- # update database/cache with "$tldr --update/-u" command
+bat
+htop
+fastfetch
+repgrep # better replacement of "ripgrep" ## GUI alternative is "catfish"
+man-db
 
 #### for zsh ####
 zsh
-zsh-fast-syntax-highlighting  # better replacement of "zsh-syntax-highlighting"
+zsh-fast-syntax-highlighting  # better replacement of "zsh-syntax-highlighting"  ## Bharat-OS
 # zsh-autosuggestions
 
+### fonts ###
+ttf-iosevka-nerd
+ttf-indic-otf # hindi fonts
+noto-fonts
+noto-fonts-emoji 
 
-# linux-headers-lts
-# linux-lts
-# dialogs
-# reflector
+#### themes ####
+nwg-look  # for gtk-2.0 , gtk-3.0 , gtk-4.0 all    ###  lxappearance : only for gtk-2.0  ### lxappearance-gtk3 : only for gtk-3.0
+qt5ct
+xcursor-breeze
+surfn-icons-git
+arc-dark-purple-bharatos  ## Bharat-OS
+# a-candy-beauty-icon-theme-git
+# sweet-cursor-theme-git
+# sweet-gtk-theme-dark
+# arc-blackest-theme-git  ## was comming from arcolinux repo
+# epapirus-icon-theme
+
+### File management ###
+thunar
+gvfs
+gvfs-afc            # iOS device support
+thunar-volman
+tumbler
+ffmpegthumbnailer   # generate video thumbnails for file managers
+thunar-archive-plugin
+thunar-media-tags-plugin
+engrampa            # "file-roller" have more option but it's theming is odd (second best option would be "xarchiver")
+unrar
+
+### System utilities ###
+polkit-gnome  # polkit authentication agent for GNOME/GTK environments
+light         # brightness control
+reflector     # mirror ranking/updating
+keyd          # remaping keys for keyboard
+yay           # AUR helper
+
+#### media / apps ####
+firefox
+obsidian
+flameshot
+sublime-text-4
+meld
+mpv
+yt-dlp
 
 )
 
-pacman -S --noconfirm --needed "${pkgs[@]}"
+pacman -Syyy --noconfirm --needed "${pkgs[@]}"
 
 
 
@@ -577,7 +691,6 @@ systemctl enable NetworkManager     # don't put --now will give you error
 
 
 
-
 echo "##########################################################################"
 echo "############### setting up auto temporary file cleanup ###################"
 echo "##########################################################################"
@@ -615,22 +728,99 @@ EndSection ' > /etc/X11/xorg.conf.d/30-touchpad.conf
 
 
 echo "##########################################################################"
-echo "##################### installing display manager #########################"
+echo "############# setting up keyboard configuration by X11 ###################"
 echo "##########################################################################"
 
-# $startx (how to use) or $startx awesome
-	#   .xinitrc {
-	# 	exec wm
-	# 	or 
-	# 	exec <path to wm>
-	# }
+echo '
+Section "InputClass"
+        Identifier "system-keyboard"
+        MatchIsKeyboard "on"
+        Option "XkbLayout" "us"
+        Option "AutoRepeat" "220 20"                           # fast keys (220sleepDelay 20repeat if lower number means fast and higher number means slow)
+        # Option "XkbOptions" "caps:escape_shifted_capslock"   # capslock ==> esc ## shift+capslock ==> capslock ##     ### this functionality is now handled by "keyd" package
+EndSection ' > /etc/X11/xorg.conf.d/00-keyboard.conf
 
+# fast keys will not brack automatically (like when it's used to in xinitrc)
+# capslock functionality will stay persistent ever after replugin keyboard on running xsession (DE/WM) (like problem existed when configured in xinitrc)
+
+## source
+# https://wiki.archlinux.org/title/Xorg/Keyboard_configuration#Using_X_configuration_files (for capslock)
+# https://wiki.archlinux.org/title/Xorg/Keyboard_configuration#Adjusting_typematic_delay_and_rate (for fast keys)
+# for more look at 'capslock' notes ; and 'xinitrc'
+
+
+echo "##########################################################################"
+echo "############# setting up keyboard configuration by keyd ##################"
+echo "##########################################################################"
+
+
+echo '
+
+[ids]
+*
+
+[main]
+compose = overload(meta, noop)
+capslock = overload(mylayer1, esc)
+backslash = overload(mylayer2, backslash)
+
+[mylayer1]
+h = left
+j = down
+k = up
+l = right
+n = home
+m = end
+u = C-z
+b = C-left
+. = C-right
+i = C-backspace
+p = C-delete
+o = S-enter
+y = backspace
+d = macro(home home S-end S-end delete delete)
+
+[mylayer2]
+q = leftbrace
+w = S-leftbrace
+e = S-backslash
+r = S-rightbrace
+t = rightbrace
+a = S-minus
+s = minus
+d = equal
+f = S-equal
+
+[shift]
+capslock = capslock ' > /etc/keyd/default.conf
+
+
+systemctl enable keyd
+
+
+## source 
+# https://github.com/rvaiya/keyd
+
+
+
+
+
+
+# echo "##########################################################################"
+# echo "##################### installing display manager #########################"
+# echo "##########################################################################"
+
+# $startx (how to use) or $startx awesome
+#	   .xinitrc {
+#	 	exec wm
+#	 	or 
+#	 	exec <path to wm>
+#	 }
 
 ### install lightdm
 # sudo pacman -S lightdm
 # sudo pacman -S lightdm-gtk-greeter lightdm-gtk-greeter-settings
 # sudo systemctl enable lightdm.service
-
 
 ### install sddm
 # sudo pacman -S sddm
@@ -686,19 +876,16 @@ echo "##########################################################################
 
 #part33
 
-su - $username -c "chezmoi init --apply https://github.com/tushantverma/dotfiles"
-./home/$username/.bin/1_setup_all.sh
+
+# su - $username -c "chezmoi init --apply https://github.com/tushantverma/dotfiles"  
+# gives error : "tty: ttyname error: No such device" but final executed result is fine
+
+sudo -u $username -H chezmoi init --apply https://github.com/tushantverma/dotfiles
+# -H: Sets $HOME to the target user's home directory (/home/username)
+
+/home/$username/.bin/1_setup_all.sh
+# if this script run as a USER, sudo inside will prompt you for the password
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+#part44
