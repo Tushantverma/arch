@@ -2,6 +2,8 @@
 
 # setfont ter-128n   #### changing the font size "ter" is a font name and "128n" or "v28n" is the font size example
 # screen -h 99999    #### for scrollback on tty while installing OS (99999 is the schrollback buffer) (it's tmux alternative ) eanble scrolling "ctrl + a ["     disable scrolling "esc"
+# tmux : scroll      #### { "ctrl+b [" up/dn arrow key   ; q to quit }
+#        window      #### { "ctrl+b c" create new window ; "ctrl+b 0-9" to switch ; exit to close }
 
 # bash <(curl -L https://raw.githubusercontent.com/Tushantverma/arch/main/testing-install.sh)          ## you can run the script this way without git clone  (my script is not designed to use this... #not working)
 # curl -o install.sh -L https://raw.githubusercontent.com/Tushantverma/arch/main/testing-install.sh    ## you can get the script this way without git clone
@@ -221,7 +223,7 @@ echo "##########################################################################
 pacman --noconfirm -Syyy archlinux-keyring reflector
 
 iso=$(curl -4 ifconfig.co/country-iso)
-reflector -a 48 -c $iso -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
+reflector -a 48 -c $iso -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist 2>/dev/null
 # reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist  # old way
 # you can try : https://wiki.archlinux.org/title/mirrors
 
