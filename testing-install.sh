@@ -495,6 +495,7 @@ network-manager-applet
 net-tools        # ifconfig, netstat, etc
 wireless_tools   # iwconfig, old wireless utils
 wget             # CLI tool to download files from the web
+darkhttpd        # better then 'python -m http.server' ## supports HTTP Range requests which allow media streaming
 
 ### Audio ###
 pulseaudio
