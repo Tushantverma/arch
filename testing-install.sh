@@ -31,6 +31,7 @@ exit
 
 
 #part11
+
 echo "##########################################################################"
 echo "################### checking internet connection #########################"
 echo "##########################################################################"
@@ -49,7 +50,7 @@ echo "##########################################################################
 #	$ iwctl
 #	> device list (show device list)
 #	> station wlan0 scan (to scan wifi near me)
-#	> station wlan0 get-network (to show all network)
+#	> station wlan0 get-networks (to show all network)
 #	> station wlan0 connect "ESSID" (you can directlly connect it by this)
 #		passphrase: *****
 # exit and check $ping -c 4 google.com
@@ -222,7 +223,8 @@ echo "##########################################################################
 
 pacman --noconfirm -Syyy archlinux-keyring reflector
 
-iso=$(curl -4 ifconfig.co/country-iso)
+# iso=$(curl -4 ifconfig.co/country-iso)                                              # old method
+iso=$(curl -fsS https://ipinfo.io/country || curl -fsS https://ipapi.co/country_code) # new method
 reflector -a 48 -c $iso -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist 2>/dev/null
 # reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist  # old way
 # you can try : https://wiki.archlinux.org/title/mirrors
@@ -364,11 +366,9 @@ echo "##########################################################################
 echo "########################### setting up clock #############################"
 echo "##########################################################################"
 
-# setup your timezone
-# file is already in your system you just need to link it with other location
-# time_zone="$(curl --fail https://ipapi.co/timezone)" ### time_zone variable will return your timezone automatically ### Added this from arch wiki https://wiki.archlinux.org/title/System_time
-
-ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime
+# setup timezone
+timezone=$(curl -fsS https://ipinfo.io/timezone || curl -fsS https://ipapi.co/timezone)  # ref : https://wiki.archlinux.org/title/System_time#Setting_based_on_geolocation
+ln -sf /usr/share/zoneinfo/$timezone /etc/localtime
 #					       <TAB> / <TAB>
 #---------------------or------------------------------
 #timedatectl list-timezones  (to check all the timezone)
@@ -377,6 +377,11 @@ ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime
 
 # sync hardware clock
 hwclock --systohc
+
+#### NTP takes 2MB RAM ####
+# systemctl enable systemd-timesyncd.service   # enable NTP service for future boot
+# timedatectl set-ntp true             # enable and start NTP on the running system
+#### to sync time on the running system you can just 'start' and 'stop' the service
 
 
 echo "##########################################################################"
@@ -663,7 +668,9 @@ echo "##########################################################################
 rm -rf /etc/skel/.bash*  ## this files are not required even if you are using your default shell as bash
 
 useradd -m -g users -G audio,video,network,wheel,storage,rfkill -s $(which zsh) $username   
-# -s means --shell , -m means create home directory for the newuser with the same name as username
+# -s means --shell , 
+# -m means --create-home, (create home directory for the new user with the same name as username)
+# -k /dev/null, prevent copying files from skeleton directory (/etc/skel) to home by changing the input location to /dev/null device
 
 #passwd $username
 
@@ -743,7 +750,7 @@ Section "InputClass"
         # Option "XkbOptions" "caps:escape_shifted_capslock"   # capslock ==> esc ## shift+capslock ==> capslock ##     ### this functionality is now handled by "keyd" package
 EndSection ' > /etc/X11/xorg.conf.d/00-keyboard.conf
 
-# fast keys will not brack automatically (like when it's used to in xinitrc)
+# fast keys will not break automatically (like when it's used to in xinitrc)
 # capslock functionality will stay persistent ever after replugin keyboard on running xsession (DE/WM) (like problem existed when configured in xinitrc)
 
 ## source
@@ -765,7 +772,8 @@ echo '
 [main]
 compose = overload(meta, noop)
 capslock = overload(mylayer1, esc)
-backslash = overload(mylayer2, backslash)
+backslash = overloadt(control, backslash, 200)
+tab = overloadt(control, tab, 200)
 
 [mylayer1]
 h = left
@@ -782,17 +790,6 @@ p = C-delete
 o = S-enter
 y = backspace
 d = macro(home home S-end S-end delete delete)
-
-[mylayer2]
-q = leftbrace
-w = S-leftbrace
-e = S-backslash
-r = S-rightbrace
-t = rightbrace
-a = S-minus
-s = minus
-d = equal
-f = S-equal
 
 [shift]
 capslock = capslock ' > /etc/keyd/default.conf
