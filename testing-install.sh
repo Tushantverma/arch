@@ -501,6 +501,7 @@ net-tools        # ifconfig, netstat, etc
 wireless_tools   # iwconfig, old wireless utils
 wget             # CLI tool to download files from the web
 darkhttpd        # better then 'python -m http.server' ## supports HTTP Range requests which allow media streaming
+aria2            # CLI download manager
 
 ### Audio ###
 pulseaudio
@@ -541,6 +542,7 @@ noto-fonts-emoji
 #### themes ####
 nwg-look  # for gtk-2.0 , gtk-3.0 , gtk-4.0 all    ###  lxappearance : only for gtk-2.0  ### lxappearance-gtk3 : only for gtk-3.0
 qt5ct
+qt6ct
 xcursor-breeze
 surfn-icons-git
 arc-dark-purple-bharatos  ## Bharat-OS
@@ -765,15 +767,25 @@ echo "##########################################################################
 
 
 echo '
-
 [ids]
 *
 
 [main]
 compose = overload(meta, noop)
 capslock = overload(mylayer1, esc)
-backslash = overloadt(control, backslash, 200)
-tab = overloadt(control, tab, 200)
+backslash = overloadt(control_layer1, backslash, 160)
+tab = overloadt(control_layer1, tab, 160)
+
+[control_layer1:C]
+1 = M-1
+2 = M-2
+3 = M-3
+4 = M-4
+5 = M-5
+6 = M-6
+7 = M-7
+8 = M-8
+9 = M-9
 
 [mylayer1]
 h = left
