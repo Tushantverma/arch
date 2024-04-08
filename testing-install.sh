@@ -543,7 +543,7 @@ noto-fonts-emoji
 nwg-look  # for gtk-2.0 , gtk-3.0 , gtk-4.0 all    ###  lxappearance : only for gtk-2.0  ### lxappearance-gtk3 : only for gtk-3.0
 qt5ct
 qt6ct
-xcursor-breeze
+breeze-cursors
 surfn-icons-git
 arc-dark-purple-bharatos  ## Bharat-OS
 # a-candy-beauty-icon-theme-git
@@ -582,8 +582,45 @@ yt-dlp
 
 )
 
-pacman -Syyy --noconfirm --needed "${pkgs[@]}"
+# pacman -Syyy --noconfirm --needed "${pkgs[@]}"
 
+
+# --------------------------------------------------------------------------------- #
+# --------- collect all available pkgs from all repo at once in the array --------- #
+# --------------------------------------------------------------------------------- #
+
+#-------- method 1 --------#
+declare -A avl_pkg_array
+while IFS= read -r one_pkg; do
+    avl_pkg_array["$one_pkg"]=1
+done < <(pacman -Slq; pacman -Sgq)
+
+#-------- method 2 --------#
+# declare -A avl_pkg_array
+# mapfile -t avl_pkg_list < <(pacman -Slq; pacman -Sgq)
+
+# for one_pkg in "${avl_pkg_list[@]}"; do
+#   avl_pkg_array["$one_pkg"]=1
+# done
+#--------------------------#
+
+# printf '%s\n' "${!avl_pkg_array[@]}" | wc -l
+
+# --------------------------------------------------------------------------------- #
+# ---- before installing pkg check it's available in the avl_pkg_array or not ----- #
+# --------------------------------------------------------------------------------- #
+
+available=() ; unavailable=() ;
+for pkg in "${pkgs[@]}"; do
+    [[ ${avl_pkg_array["$pkg"]+_} ]] && available+=("$pkg") || unavailable+=("$pkg")
+done
+
+# echo "$(tput setaf 3)Available   (${#available[@]}): ${available[*]:-none} $(tput sgr0)"
+echo "$(tput setaf 3)Unavailable (${#unavailable[@]}): ${unavailable[*]:-none} $(tput sgr0)"
+
+pacman -Syyy --noconfirm --needed "${available[@]}"
+
+# --------------------------------------------------------------------------------- #
 
 
 #### bugs pkg ####
@@ -846,6 +883,7 @@ echo "####################### searching for virtualization #####################
 echo "##########################################################################"
 
 hypervisor=$(systemd-detect-virt)
+	echo "your hypervisor is : $hypervisor"
     case $hypervisor in
     	none )      echo "main machine is detected"
 		            pacman --noconfirm -S picom 
