@@ -572,7 +572,7 @@ keyd          # remaping keys for keyboard
 yay           # AUR helper
 
 #### media / apps ####
-firefox
+helium-browser-bin # firefox
 obsidian
 flameshot
 sublime-text-4
@@ -588,6 +588,8 @@ yt-dlp
 # --------------------------------------------------------------------------------- #
 # --------- collect all available pkgs from all repo at once in the array --------- #
 # --------------------------------------------------------------------------------- #
+
+pacman -Syyy     # pacman -Slq; pacman -Sgq need it
 
 #-------- method 1 --------#
 declare -A avl_pkg_array
@@ -616,9 +618,12 @@ for pkg in "${pkgs[@]}"; do
 done
 
 # echo "$(tput setaf 3)Available   (${#available[@]}): ${available[*]:-none} $(tput sgr0)"
-echo "$(tput setaf 3)Unavailable (${#unavailable[@]}): ${unavailable[*]:-none} $(tput sgr0)"
+if [[ ${#unavailable[@]} -gt 0 ]]; then
+    echo "$(tput setaf 1)Unavailable (${#unavailable[@]}): ${unavailable[*]} $(tput sgr0)"
+    sleep 10 ;
+fi
 
-pacman -Syyy --noconfirm --needed "${available[@]}"
+pacman -S --noconfirm --needed "${available[@]}"
 
 # --------------------------------------------------------------------------------- #
 
@@ -882,7 +887,7 @@ echo "##########################################################################
 echo "####################### searching for virtualization #####################"
 echo "##########################################################################"
 
-hypervisor=$(systemd-detect-virt)
+hypervisor=$(systemd-detect-virt --vm)
 	echo "your hypervisor is : $hypervisor"
     case $hypervisor in
     	none )      echo "main machine is detected"
