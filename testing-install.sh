@@ -267,6 +267,72 @@ mkdir -p /mnt/etc/
 echo "KEYMAP=us" > /mnt/etc/vconsole.conf # Sets layout for next boot (persistent)
 
 echo "##########################################################################"
+echo "################### installing required linux-firmware ###################"
+echo "##########################################################################"
+
+# ── PCI vendor IDs (same source chwd uses via libpci) ────────────────────────
+# Format from `lspci -n`: "BBBB:DD.F CCCC: VVVV:DDDD"
+#   CCCC = PCI class  |  VVVV = vendor ID  |  DDDD = device ID
+PCI_VENDORS=$(lspci -n | awk '{print $3}' | cut -d: -f1 | sort -u)
+
+# ── Vendor ID → firmware package map ────────────────────────────────────────
+# Vendor IDs: 1002=AMD, 10de=Nvidia, 8086=Intel, 10ec=Realtek,
+#             14e4=Broadcom, 168c=Atheros/QCA, 17cb=Qualcomm,
+#             1b4b=Marvell NIC, 11ab=Marvell (legacy),
+#             1077=QLogic, 15b3=Mellanox, 0e8d=MediaTek
+declare -A MAP=(
+
+    # --- linux-firmware split -------------------
+    ["1002"]="linux-firmware-amdgpu linux-firmware-radeon"
+    ["168c"]="linux-firmware-atheros"
+    ["14e4"]="linux-firmware-broadcom"
+    ["1013"]="linux-firmware-cirrus"
+    ["8086"]="linux-firmware-intel"
+    ["0e8d"]="linux-firmware-mediatek"
+    ["10de"]="linux-firmware-nvidia"
+    ["10ec"]="linux-firmware-realtek"
+
+    # --- Not in linux-firmware ------------
+    # ["1825"]="linux-firmware-liquidio"
+    # ["1b4b"]="linux-firmware-marvell"
+    # ["11ab"]="linux-firmware-marvell"
+    # ["17cb"]="linux-firmware-qcom"
+    # ["1077"]="linux-firmware-qlogic"
+    # ["15b3"]="linux-firmware-mellanox"
+    # ["19ee"]="linux-firmware-nfp"
+    # ["1da8"]="linux-firmware-nfp"
+
+    # --- linux-firmware-other -------------
+    # ["106b"] — Apple Inc.
+    # ["15ad"] — VMware
+    # ["80ee"] — VirtualBox (InnoTek)
+)
+
+# ── Detect & collect ──────────────────────────────────────────────────────────
+declare -A seen
+FIRMWARE_PKGS=()
+
+for vendor in $PCI_VENDORS; do
+    pkglist="${MAP[$vendor]:-}"
+    [[ -z "$pkglist" ]] && continue
+    for pkg in $pkglist; do
+        [[ -n "${seen[$pkg]:-}" ]] && continue
+        seen[$pkg]=1
+        FIRMWARE_PKGS+=("$pkg")
+        echo "found : $vendor → $pkg"
+    done
+done
+
+FIRMWARE_PKGS+=("linux-firmware-whence" "linux-firmware-other")   # always required
+# linux-firmware-whence == dependency for all
+
+# ── Install ───────────────────────────────────────────────────────────────────
+echo "packages: ${FIRMWARE_PKGS[*]}"
+# sudo pacman -S --needed "${FIRMWARE_PKGS[@]}"
+# only saving approx 200MB diskspace
+
+
+echo "##########################################################################"
 echo "########################## installing base system ########################"
 echo "##########################################################################"
 
@@ -277,7 +343,7 @@ echo "##########################################################################
 # linux-lts
 # linux-zen
 
-pacstrap /mnt base base-devel linux-lts linux-firmware neovim btrfs-progs sed git
+pacstrap /mnt base base-devel linux-lts neovim btrfs-progs sed git "${FIRMWARE_PKGS[@]}" # linux-firmware
    
 genfstab -U -p /mnt >> /mnt/etc/fstab
 # The -p flag include all the partitions including those that are not currently mounted... -U flags tells use UUID in fstab
