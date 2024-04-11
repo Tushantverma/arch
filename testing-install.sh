@@ -216,6 +216,31 @@ sleep 10s #check all correct above
 lsblk -p  ## -p => prints full device path
 sleep 5s
 
+
+# echo "##########################################################################"
+# echo "######################## setting up cachyos repo #########################"
+# echo "##########################################################################"
+
+# setup_cachyos_repo() {
+#
+# 	pacman -Syyy
+# 	pushd /tmp #--------------------#
+# 	curl https://mirror.cachyos.org/cachyos-repo.tar.xz -o cachyos-repo.tar.xz
+# 	tar xvf cachyos-repo.tar.xz && cd cachyos-repo
+# 	sed -i '/pacman -Syu/d' cachyos-repo.sh # remove full update
+# 	sed -i 's/pacman /pacman --noconfirm /g' cachyos-repo.sh # add --noconfirm
+# 	./cachyos-repo.sh
+# 	sed -i '/cdn77\.cachyos\.org/d' /etc/pacman.d/cachyos-*  # removing dead mirror from mirrorlist
+# 	popd #--------------------------#
+
+# 	# comment out core and extra repo
+# 	# sed -i '/\[core\]/,/Include/s/^/#/'  /etc/pacman.conf
+# 	# sed -i '/\[extra\]/,/Include/s/^/#/' /etc/pacman.conf
+
+# }
+# setup_cachyos_repo && export -f setup_cachyos_repo
+
+
 echo "##########################################################################"
 echo "######################### fixing archlinux keyring #######################"
 echo "##########################################################################"
@@ -342,6 +367,7 @@ echo "##########################################################################
 # linux-hardened
 # linux-lts
 # linux-zen
+# linux-cachyos
 
 pacstrap /mnt base base-devel linux-lts neovim btrfs-progs sed git "${FIRMWARE_PKGS[@]}" # linux-firmware
    
@@ -481,6 +507,11 @@ setup_pacman_conf # executing exported function to setup pacman.conf for main sy
 # pacman -Syyy
 
 
+# echo "##########################################################################"
+# echo "######################## setting up cachyos repo #########################"
+# echo "##########################################################################"
+
+# setup_cachyos_repo
 
 # echo "##########################################################################"
 # echo "######################## getting arco key and repo #######################"
